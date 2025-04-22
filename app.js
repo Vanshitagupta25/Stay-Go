@@ -45,6 +45,7 @@ app.use(session({
 }));
 app.get("/" , (req,res) => {
   res.send("hi, i am root");
+  console.log("successsful");
 });
 
 app.use(flash());
