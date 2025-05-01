@@ -16,6 +16,8 @@ const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
 
 
+
+
 main()
   .then(() => {
     console.log("monggose suucessful");
@@ -59,6 +61,7 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req,res,next) => {
   res.locals.info = req.flash("info");
   res.locals.error = req.flash("error");
+  res.locals.currUser = req.user;
   next();
 });
 
