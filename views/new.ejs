@@ -1,6 +1,6 @@
 <% layout("/layouts/boilerplate") %>
   <h3>Create a new listing</h3>
-  <form action="/listings" method="POST" novalidate class="needs-validation">
+  <form action="/listings" method="POST" novalidate class="needs-validation" enctype="multipart/form-data">
 
     <div class="row mb-4">
       <div class="col-8 offset-2">
@@ -12,13 +12,14 @@
          </div>
  
          <div class="mb-3">
-           <label for="description" class="form-label">description</label>
+           <label for="description" class="form-label">Description</label>
           <textarea placeholder="Add description" name="listing[description]" class="form-control "required></textarea>
         </div>
-     
+
          <div class="mb-3">
-           <label for="image" class="form-label">Image Url</label>
-           <input name="listing[image]" placeholder="enter image URL" type="text" class="form-control">
+           <label for="image" class="form-label">Upload Listing Image</label>
+           <input name="listing[image]" type="file" class="form-control"
+           required>
          </div>
           <div class="mb-3">
             <label for="price" class="form-label">Price</label>
@@ -30,17 +31,16 @@
            </div>
     
             <div class="mb-3 col-8">
-              <label for="country"  class="form-label">country</label>
+              <label for="country"  class="form-label">Country</label>
               <input placeholder="India"type="text" , name="listing[country]" class="form-control"required>
 
               <div class="invalid-feedback">
                 Please enter a valid country name
               </div>
              </div>
- 
    
               <div class="mb-3">
-                <label for="location" class="form-location">location</label>
+                <label for="location" class="form-location">Location</label>
                 <input placeholder="Indore"type="text" name="listing[location]"    class="form-control"required>
 
                 <div class="invalid-feedback">

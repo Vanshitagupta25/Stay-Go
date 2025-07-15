@@ -1,8 +1,8 @@
 <% layout("/layouts/boilerplate") %>
     <h3>Edit listing!</h3>
-    <form method="POST" action="/listings/<%=listing._id%>?_method=PUT" novalidate class="needs-validation">
+    <form method="POST" action="/listings/<%=listing._id%>?_method=PUT" novalidate class="needs-validation" enctype="multipart/form-data">
       <div class="row mt-3">
-        <div class="col-8">
+        <div class="col-12">
           <div class="mb-3">
             <label for="title" class="form-label">Title</label>
             <input
@@ -12,7 +12,7 @@
               class="form-control"
               required
             />
-            <div class="valid-feedback">Tittle is Awesome</div>
+            <div class="valid-feedback">Title is Awesome</div>
          </div>
           </div>
           <div class="mb-3">
@@ -21,18 +21,22 @@
              name="listing[description]"
               class="form-control"><%=listing.description%></textarea
             >
+            <div class="invalid-feedback">Please enter a short description></div>
+          </div>
+          
+          <div class="mb-3">
+            <img src="<%= originalImageUrl %>" width="250" height="160">
           </div>
 
           <div class="mb-3">
-            <label for="image" class="form-label">Image Url</label>
+            <label for="image" class="form-label">Upload New Image</label>
             <input
               name="listing[image] "
               class="form-control"
-              type="text"
-              value="<%=listing.image%>"
+              type="file"
             />
           </div>
-           <div class="mb-3 col-6">
+           <div class="mb-3">
              <label for="price" class="form-label">Price</label>
              <input
               name="listing[price]"
@@ -41,8 +45,8 @@
              />
              <div class="invalid-feedback">
               Please enter a valid price
-            </div>
-           <div class="mb-3 ">
+            </div><br>
+           <div class="mb-3">
              <label for="country" class="form-label">Country</label>
              <input
                type="text"
@@ -51,7 +55,7 @@
                required
               />
               <div class="invalid-feedback">
-                country name should be valid
+                Country name should be valid
               </div>
            </div>
 
