@@ -64,8 +64,7 @@ const sessionConfig = {
   },
 };
 app.get("/" , (req,res) => {
-  res.send("Stay-Go is live");
-  res.render("home.ejs");
+  res.render("home.ejs", { message: "Stay-Go is live" });
 });
 
 app.use(session(sessionConfig));
