@@ -19,6 +19,7 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
+const Listing = require("./models/listing.js");
 
 const dbUrl = process.env.ATLASDB_URL;
 const PORT = process.env.PORT || 8080;
@@ -79,8 +80,9 @@ app.use((req,res,next) => {
   res.locals.currUser = req.user;
   next();
 });
-app.get("/" , (req,res) => {
-  res.render("home.ejs", { message: "Stay-Go is live" });
+app.get("/", async (req, res) => {
+  const allListing = await Listing.find({});
+  res.render("home.ejs", { allListing });
 });
 
 app.use("/listings" , listingRouter);
