@@ -21,6 +21,7 @@ const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
 
 const dbUrl = process.env.ATLASDB_URL;
+const PORT = process.env.PORT || 8080;
 
 main()
   .then(() => {
@@ -62,10 +63,10 @@ const sessionConfig = {
     httpOnly: true,
   },
 };
-// app.get("/" , (req,res) => {
-//   res.send("hi, i am root");
-//   console.log("successsful");
-// });
+app.get("/" , (req,res) => {
+  res.send("Stay-Go is live");
+  res.render("home.ejs");
+});
 
 app.use(session(sessionConfig));
 app.use(flash());
@@ -83,27 +84,15 @@ app.use((req,res,next) => {
   next();
 });
 
-// app.get("/demouser" , async(req,res) => {
-// let fakeUser= new User({
-//   email: "radheshyam@gmail.com",
-//   username: "Radheyshyam",
-// });
-
-// let registeredUser = await User.register(fakeUser, "helloworld");
-// console.log(registeredUser);
-// res.send(registeredUser);
-// });
-
 app.use("/listings" , listingRouter);
 app.use("/listings/:id/reviews" , reviewRouter);
 app.use("/" , userRouter);
 
 app.use((err, req, res, next) => {
   let { status = 500, message = "Something went wrong!" } = err;
-  // res.render("error.ejs" , {message});
   res.status(status).render("error.ejs", { message });
 });
 
-app.listen("8080", () => {
-  console.log("server is listening");
-});
+app.listen(PORT, () => {
+  console.log(`Server is listening on port, ${PORT}`);
+})
