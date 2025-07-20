@@ -63,9 +63,6 @@ const sessionConfig = {
     httpOnly: true,
   },
 };
-app.get("/" , (req,res) => {
-  res.render("home.ejs", { message: "Stay-Go is live" });
-});
 
 app.use(session(sessionConfig));
 app.use(flash());
@@ -81,6 +78,9 @@ app.use((req,res,next) => {
   res.locals.error = req.flash("error");
   res.locals.currUser = req.user;
   next();
+});
+app.get("/" , (req,res) => {
+  res.render("home.ejs", { message: "Stay-Go is live" });
 });
 
 app.use("/listings" , listingRouter);
