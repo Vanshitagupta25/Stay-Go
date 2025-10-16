@@ -81,8 +81,13 @@ app.use((req,res,next) => {
   next();
 });
 app.get("/", async (req, res) => {
-  const allListing = await Listing.find({});
-  res.render("home.ejs", { allListing });
+  try {
+    const allListings = await Listing.find({});
+    res.render("home.ejs", { allListings, category: '' });
+  } catch (e) {
+    console.log(e);
+    res.send("Error loading listings");
+  }
 });
 
 app.use("/listings" , listingRouter);
