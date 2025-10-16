@@ -77,29 +77,13 @@ app.use((req,res,next) => {
   res.locals.info = req.flash("info");
   res.locals.error = req.flash("error");
   res.locals.currUser = req.user;
+  res.locals.searchHistory = req.session.searchHistory || [];
   next();
 });
 app.get("/", async (req, res) => {
   const allListing = await Listing.find({});
   res.render("home.ejs", { allListing });
 });
-
-app.use((req, res, next) => {
-  res.locals.currUser = req.user;  
-  next();
-});
-
-app.use((req,res,next) => {
-  res.locals.searchHistory = req.session.searchHistory || [];
-  next();
-})
-
-app.use((req, res, next) => {
-  res.locals.searchHistory = [];
-  next();
-});
-
-
 
 app.use("/listings" , listingRouter);
 app.use("/listings/:id/reviews" , reviewRouter);
