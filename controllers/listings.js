@@ -4,9 +4,59 @@ const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
 module.exports.index = async (req, res) => {
-  const allListing = await Listing.find({});
-  console.log("working");
-  res.render("home.ejs", { allListing });
+ const { city, category } = req.query;
+ let allListings = [];
+
+ if(!req.session.searchHistory) req.session.searchHistory = [];
+
+ if (city) {
+  if(!req.session.searchHistory.includes(city)) {
+    req.session.searchHistory.unshift(city);
+    req.session.searchHistory = req.session.searchHistory.slice(0,5);
+  }
+ }
+ if(city && category) {
+   const matchedListings = await Listing.find({
+    location: { $regex: new RegExp(city, "i")},
+    category: category,
+  });
+
+  matchedListings.forEach(listing => listing.isMatched = true);
+  const otherListings = await Listing.find({
+    $or: [
+    { location: {$not: { $regex: new RegExp(city, "i")} }},
+    { category: { $ne: category }},
+    ],
+  });
+
+  allListings = [...matchedListings, ...otherListings];
+ }
+ else if (city) {
+    const matchedListings = await Listing.find({
+      location: { $regex: new RegExp(city, "i") },
+    });
+    matchedListings.forEach(listing => (listing.isMatched = true));
+
+    const otherListings = await Listing.find({
+      location: { $not: { $regex: new RegExp(city, "i") } },
+    });
+
+    allListings = [...matchedListings, ...otherListings];
+  }
+  else if(category){
+  allListings = await Listing.find({category});
+ }
+ else {
+  allListings = await Listing.find({});
+ }
+ console.log("Search working for:", city || "All cities");
+  console.log("Category filter:", category || "None");
+
+ res.render("home.ejs", {
+  allListings,
+  category,
+  searchHistory: req.session.searchHistory
+});
 };
 
 module.exports.new = (req, res) => {
@@ -29,7 +79,7 @@ module.exports.show = async (req, res) => {
   console.log(listing);
   res.render("show.ejs", { listing });
 };
-module.exports.create = async (req, res, next) => {
+module.exports.create = async (req, res) => {
   let response = await geocodingClient
     .forwardGeocode({
       query: req.body.listing.location,

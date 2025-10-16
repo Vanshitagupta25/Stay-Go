@@ -7,12 +7,13 @@
     background-color: #fe424d;
     color: #fff;
     border-radius: 25px;
-    padding: 0 1rem;
+    padding: 0.5rem 1rem;
     font-size: 1rem;
+    margin-left: 6px;
   }
 
   .search-btn:hover {
-    background-color: #fe424d;
+    background-color: #e73b45;
     color: #fff;
   }
 
@@ -22,16 +23,16 @@
   }
 
   .search-inp {
-    border-radius: 25px;
+    border-radius: 6px;
     padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-    width: 250px; /* Fixed width like original */
+    font-size: 0.9rem;
+    width: 250px;
+    border: 1px solid #ccc; 
   }
 
-  /* Search dropdown styles - Airbnb-like */
   .search-container {
     position: relative;
-    display: inline-block; /* Makes container fit content */
+    display: inline-block; 
   }
   
   .search-results {
@@ -143,31 +144,44 @@
 </style>
 
 <nav class="navbar navbar-expand bg-body-light border-bottom sticky-top">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/listings"><i class="fa fa-compass" aria-hidden="true"></i></a>
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+   
+    <!-- logo + explore -->
+     <div class="d-flex align-items-center  gap-3">
+      <a class="navbar-brand" href="/listings">
+        <i class="fa fa-compass" aria-hidden="true"></i>
+      </a>
+      <a class="nav-link" href="/listings">Explore</a>
+     </div>
 
-    <!-- Always visible navbar content -->
-    <div class="navbar-collapse">
-      <!-- Left: Explore -->
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" href="/listings">Explore</a>
-        </li>
-      </ul>
-      <div class="navbar-nav ms-auto">
-        <form class="d-flex" role="search">
-         <input class="form-control me-2"  type="search" placeholder="Search"  aria-label="Search"/>
-          <button class="btn search-btn ms-2" type="submit">
-            <i class="fa-solid fa-magnifying-glass"></i>Search
-          </button>
-        </form> 
-      </div>
+    <div class="flex-grow-1 d-flex justify-content-center">
+  <form class="d-flex position-relative dropdown" role="search" action="/listings" method="GET" id="searchForm">
+    <input 
+      class="form-control search-inp dropdown-toggle" 
+      type="text"
+      placeholder="Search destinations..."  
+      aria-label="Search"
+      name="city" 
+      id="citySearch"
+      data-bs-toggle="dropdown"
+      autocomplete="off"
+    />
+
+    <button class="btn search-btn ms-2" type="submit">
+      <i class="fa-solid fa-magnifying-glass"></i> Search
+    </button>
+
+    <ul class="dropdown-menu w-100 mt-1 shadow" id="searchDropdown" style="max-height: 220px; overflow-y: auto;"></ul>
+  </form> 
+</div>
+
 
       <!-- Right: Auth Links -->
-      <ul class="navbar-nav nav-auth-links">
+      <ul class="navbar-nav nav-auth-links d-flex align-items-center gap-2">
         <li class="nav-item">
           <a class="nav-link" href="/listings/new">Airbnb your home</a>
         </li>
+
         <% if(!currUser) { %>
           <li class="nav-item">
             <a class="nav-link" href="/signup"><b>Sign up</b></a>
@@ -175,45 +189,69 @@
           <li class="nav-item">
             <a class="nav-link" href="/login"><b>Login</b></a>
           </li>
-        <% } %>
-        <% if(currUser) { %>
+        <% } else { %>
           <li class="nav-item">
             <a class="nav-link" href="/logout"><b>Logout</b></a>
           </li>
         <% } %>
       </ul>
-    </div>
   </div>
 </nav>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("citySearch");
+    const dropdown = document.getElementById("searchDropdown");
+    const form = document.getElementById("searchForm");
 
+    // Pass recent history from backend
+    const recentCities = <%- JSON.stringify(searchHistory || []) %>;
 
- <script>
-  const cities = [
-    "New Delhi", "Bhopal", "Indore", "Gurugram", "Pune",
-    "Hyderabad", "Bangalore", "Chennai", "Mumbai", "Ahmedabad"
-  ];
+    // Render the dropdown
+    function renderDropdown(list) {
+      if (!list.length) {
+        dropdown.classList.remove("show");
+        return;
+      }
 
-  const searchInput = document.getElementById("citySearch");
-  const resultsBox = document.getElementById("searchResults");
+      dropdown.innerHTML = `
+        <li><h6 class="dropdown-header text-muted">Recent Searches</h6></li>
+        ${list.map(city => `
+          <li>
+            <button class="dropdown-item" type="button" data-city="${city}">
+              <i class="fa-solid fa-location-dot text-danger me-2"></i>${city}
+            </button>
+          </li>
+        `).join("")}
+      `;
+      dropdown.classList.add("show");
+    }
 
-  searchInput.addEventListener("focus", () => {
-    resultsBox.style.display = "block";
+    // Show dropdown on focus (only if recent searches exist)
+    searchInput.addEventListener("focus", () => {
+      if (recentCities.length) renderDropdown(recentCities);
+    });
+
+    // Filter dropdown when typing
+    searchInput.addEventListener("input", () => {
+      const value = searchInput.value.toLowerCase().trim();
+      const filtered = recentCities.filter(c => c.toLowerCase().includes(value));
+      renderDropdown(filtered);
+    });
+
+    // Hide dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!form.contains(e.target)) dropdown.classList.remove("show");
+    });
+
+    // When user clicks a recent search
+    dropdown.addEventListener("click", (e) => {
+      const item = e.target.closest(".dropdown-item");
+      if (item) {
+        const city = item.getAttribute("data-city");
+        searchInput.value = city;
+        form.submit(); 
+      }
+    });
   });
-
-  searchInput.addEventListener("blur", () => {
-    setTimeout(() => resultsBox.style.display = "none", 150);
-  });
-
-  searchInput.addEventListener("input", () => {
-    const value = searchInput.value.toLowerCase();
-    const filtered = cities.filter(city => city.toLowerCase().includes(value));
-    resultsBox.innerHTML = filtered.length
-      ? filtered.map(city => `
-          <div class="search-result-item">
-            <i class="fa-solid fa-location-dot"></i> <span>${city}</span>
-          </div>
-        `).join("")
-      : <div class="search-result-item">No matches found</div>;
-  });
-
+  
 </script>

@@ -1,7 +1,6 @@
 if(process.env.NODE_ENV != "production") {
   require('dotenv').config();
 }
-
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -85,10 +84,24 @@ app.get("/", async (req, res) => {
   res.render("home.ejs", { allListing });
 });
 
+app.use((req, res, next) => {
+  res.locals.currUser = req.user;  
+  next();
+});
+
+app.use((req,res,next) => {
+  res.locals.searchHistory = req.session.searchHistory || [];
+  next();
+})
+
+
+
+
 app.use("/listings" , listingRouter);
 app.use("/listings/:id/reviews" , reviewRouter);
 app.use("/" , userRouter);
 
+//Error-handling Middleware
 app.use((err, req, res, next) => {
   let { status = 500, message = "Something went wrong!" } = err;
   res.status(status).render("error.ejs", { message });

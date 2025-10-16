@@ -5,19 +5,19 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 1.5rem;
+    gap: 2rem;
     padding: 1rem;
   }
 
   .filter {
     text-align: center;
     opacity: 0.7;
-    cursor: pointer;
     transition: all 0.3s ease;
   }
 
   .filter:hover {
     opacity: 1;
+    cursor: pointer;
     transform: translateY(-2px);
   }
 
@@ -141,17 +141,6 @@
       gap: 1rem;
     }
     
-    .tax-toggle {
-      position: fixed;
-      top: auto;
-      bottom: 20px;
-      right: 20px;
-      margin-left: 0;
-      z-index: 1000;
-      height: auto;
-      padding: 0.75rem 1rem;
-    }
-    
     .form-check-label {
       font-size: 0.8rem;
     }
@@ -211,125 +200,48 @@
     <div><i class="fa-solid fa-mug-saucer"></i></div>
     <p>Bed and Breakfast</p>
   </div>
+  
 
-  <!-- Toggle Switch - Fixed positioning -->
-  <div class="tax-toggle">
-    <div class="form-check reverse form-switch">
-      <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" 
-      role="switch"/>
-      <label class="form-check-label" for="flexSwitchCheckDefault">
-        Display total before taxes
-      </label>
-    </div>
-  </div>
-</div>
-
-<!-- LISTINGS -->
-<div class="container-fluid">
-  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
-    <% for(let listing of allListing) { %>
+<!-- listings -->
+<div class="container-fluid mt-4">
+  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-4">
+    <% allListings.forEach(listing => { %>
       <div class="col">
-        <a href="/listings/<%=listing._id%>" class="listing-link">
-          <div class="listing-card">
-            <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image" style="height: 20rem" />
-            <div class="card-img-overlay"></div>
+        <div class="card h-100 shadow-sm">
+          <a href="/listings/<%= listing._id %>" class="text-decoration-none text-dark">
+            <img 
+              src="<%= listing.image.url %>" 
+              class="card-img-top" 
+              alt="<%= listing.title %>"
+              style="height: 18rem; object-fit: cover;"
+            />
             <div class="card-body">
-              <p class="card-text">
-                <b><%= listing.title %></b>
-                <%= listing.price.toLocaleString("en-IN") %> /night
-                <i class="tax-info">&nbsp;&nbsp;+18% GST</i>
-              </p>
+              <h5 class="card-title mb-1"><%= listing.title %></h5>
+              <p class="card-text text-muted mb-2"><%= listing.location %>, <%= listing.country %></p>
+              <p class="fw-bold mb-0">₹<%= listing.price.toLocaleString("en-IN") %> / night</p>
             </div>
-          </div>
-        </a>
+          </a>
+        </div>
       </div>
-    <% } %>
+    <% }) %>
   </div>
 </div>
 
-<!-- SCRIPTS -->
-<script>
-    let taxSwitch = document.getElementById("flexSwitchCheckDefault");
-    taxSwitch.addEventListener("click" , () => {
-      let taxInfo = document.getElementsByClassName("tax-info");
-      for(info of taxInfo) {
-        if(info.style.display != "inline"){
-          info.style.display = "inline";
 
-        } else {
-          info.style.display = "none";
-        }
-      }
+<script>
+  document.querySelectorAll('.filter').forEach(filter => {
+    filter.addEventListener('click', () => {
+      const selectedCategory = filter.getAttribute('data-filter');
+
+      //redirect with category
+      window.location.href = `/listings?category=${selectedCategory}`;
     });
-    
-    // if (taxSwitch) {
-    //     taxSwitch.addEventListener("change", function(event) {
-    //         event.stopPropagation();
-            
-    //         let taxInfoElements = document.getElementsByClassName("tax-info");
-            
-    //         for (let info of taxInfoElements) {
-    //             if (this.checked) {
-    //                 info.classList.add("hidden");
-    //             } else {
-    //                 info.classList.remove("hidden");
-    //             }
-    //         }
-    //     });
-        
-    //     taxSwitch.addEventListener("click", function(event) {
-    //         event.stopPropagation();
-    //     });
-    // }
-    
-    // let toggleLabel = document.querySelector('label[for="flexSwitchCheckDefault"]');
-    // if (toggleLabel) {
-    //     toggleLabel.addEventListener("click", function(event) {
-    //         event.stopPropagation();
-    //     });
-    // }
-    
-    // let toggleContainer = document.querySelector('.tax-toggle');
-    // if (toggleContainer) {
-    //     toggleContainer.addEventListener("click", function(event) {
-    //         event.stopPropagation();
-    //     });
-    // }
-    
-    // document.querySelectorAll('.filter').forEach(filter => {
-    //     filter.addEventListener('click', function(event) {
-    //         // Stop event bubbling
-    //         event.stopPropagation();
-    //         event.preventDefault();
-            
-    //         // Remove active class from all filters
-    //         document.querySelectorAll('.filter').forEach(f => f.classList.remove('active'));
-            
-    //         // Add active class to clicked filter
-    //         this.classList.add('active');
-            
-    //         // You can add filter logic here
-    //         let filterType = this.dataset.filter;
-    //         console.log('Filter selected:', filterType);
-    //     });
-    // });
-    
-    // // Responsive behavior
-    // function handleResize() {
-    //     const taxToggle = document.querySelector('.tax-toggle');
-    //     if (window.innerWidth <= 768) {
-    //         taxToggle.style.position = 'fixed';
-    //         taxToggle.style.bottom = '20px';
-    //         taxToggle.style.right = '20px';
-    //         taxToggle.style.marginLeft = '0';
-    //     } else {
-    //         taxToggle.style.position = 'static';
-    //         taxToggle.style.bottom = 'auto';
-    //         taxToggle.style.right = 'auto';
-    //         taxToggle.style.marginLeft = 'auto';
-    //     }
-    // }
-    
-    // window.addEventListener('resize', handleResize);
-    // handleResize(); 
+  });
+
+  const currentCategory = "<%= category || '' %>";
+  if(currentCategory){
+    const activeFilter = document.querySelector(`[data-filter="${currentCategory}"]`);
+    if(activeFilter) activeFilter.classList.add('active');
+  }
+
 </script>
