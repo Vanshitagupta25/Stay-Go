@@ -11,6 +11,26 @@
     font-size: 1rem;
     margin-left: 6px;
   }
+  .search-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,.1);
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 1050;
+  display: none;
+  padding: 0;
+  list-style: none;
+}
+
+.search-dropdown.show {
+  display: block;
+}
 
   .search-btn:hover {
     background-color: #e73b45;
@@ -27,23 +47,24 @@
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
     width: 250px;
-    border: 1px solid #ccc; 
+    border: 1px solid #ccc;
   }
 
   .search-container {
     position: relative;
-    display: inline-block; 
+    display: inline-block;
   }
-  
+
   .search-results {
     position: absolute;
     top: 100%;
     left: 0;
-    width: 300px; /* Wider than input */
+    width: 300px;
+    /* Wider than input */
     background: white;
     border: 1px solid #e0e0e0;
     border-radius: 12px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
     z-index: 1000;
     max-height: 350px;
     overflow-y: auto;
@@ -51,7 +72,7 @@
     margin-top: 8px;
     padding: 8px 0;
   }
-  
+
   .search-result-header {
     padding: 8px 16px;
     font-size: 0.75rem;
@@ -59,7 +80,7 @@
     font-weight: 600;
     text-transform: uppercase;
   }
-  
+
   .search-result-item {
     padding: 12px 16px;
     cursor: pointer;
@@ -67,11 +88,11 @@
     display: flex;
     align-items: center;
   }
-  
+
   .search-result-item:hover {
     background-color: #f7f7f7;
   }
-  
+
   .search-result-item i {
     margin-right: 12px;
     color: #717171;
@@ -82,119 +103,171 @@
     .navbar {
       padding: 0.5rem 0;
     }
-    
+
     .navbar-brand {
       margin-right: 1rem;
     }
-    
+
     .navbar-nav {
       margin-left: 0;
       flex-direction: row;
       flex-wrap: wrap;
       gap: 0.5rem;
     }
-    
-    .search-wrapper {
-      order: 3;
-      width: 100%;
-      margin-top: 0.5rem;
-    }
-    
+
+
+
     form.d-flex {
       flex-direction: row;
       width: 100%;
     }
-    
+
     .search-inp {
-      padding: 0.5rem 1rem;
-      flex-grow: 1;
-      width: auto; /* Allow to grow on mobile */
+      width: 100%;
+      border-radius: 999px;
+      padding: 0.75rem 1rem;
     }
-    
+
     .search-btn {
-      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      white-space: nowrap;
     }
-    
+
     .nav-auth-links {
       margin-left: auto;
       display: flex;
       gap: 0.5rem;
     }
-    
+
     .search-results {
       width: 100%;
       left: 0;
     }
   }
 
-  @media (max-width: 576px) {
-    .navbar-nav > .nav-item:not(:first-child) {
-      display: none;
+  @media (max-width: 991px) {
+
+    .navbar .container {
+      gap: 1rem;
     }
-    
-    form.d-flex {
-      flex-direction: column;
+
+    .search-wrapper {
+      order: 3;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+    }
+
+    #searchForm {
+      width: 100%;
+    }
+
+    .search-inp {
+      width: 100%;
+    }
+
+    .nav-auth-links {
       gap: 0.5rem;
     }
-    
+
+    .nav-auth-links .nav-link {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .host-link {
+      display: none;
+    }
+  }
+
+  @media (max-width: 576px) {
+
+    .navbar-brand i {
+      font-size: 1.5rem;
+    }
+
     .search-btn {
-      width: 100%;
+      width: auto;
+      padding: 0.6rem 0.9rem;
+    }
+
+    .search-btn span {
+      display: none;
+    }
+
+    .search-btn i {
+      margin-right: 0;
+    }
+
+    .nav-auth-links {
+      gap: 0;
+    }
+
+    .nav-auth-links .nav-link {
+      font-size: 0.85rem;
+    }
+
+    .explore-link {
+      display: none;
+    }
+
+    .search-inp {
+      font-size: 0.85rem;
     }
   }
 </style>
 
-<nav class="navbar navbar-expand bg-body-light border-bottom sticky-top">
+
+
+<nav class="navbar navbar-expand bg-body-light border-bottom z-20 sticky-top">
   <div class="container-fluid d-flex justify-content-between align-items-center">
-   
+
     <!-- logo + explore -->
-     <div class="d-flex align-items-center  gap-3">
+    <div class="d-flex align-items-center  gap-3">
       <a class="navbar-brand" href="/listings">
         <i class="fa fa-compass" aria-hidden="true"></i>
       </a>
-      <a class="nav-link" href="/listings">Explore</a>
-     </div>
+      <a class="nav-link explore-link" href="/listings">Explore</a>
+    </div>
 
     <div class="flex-grow-1 d-flex justify-content-center">
-  <form class="d-flex position-relative dropdown" role="search" action="/listings" method="GET" id="searchForm">
-    <input 
-      class="form-control search-inp dropdown-toggle" 
-      type="text"
-      placeholder="Search destinations..."  
-      aria-label="Search"
-      name="city" 
-      id="citySearch"
-      data-bs-toggle="dropdown"
-      autocomplete="off"
-    />
+      <div class="search-wrapper">
+        <form class="d-flex position-relative dropdown" role="search" action="/listings" method="GET" id="searchForm">
+          <input class="form-control search-inp dropdown-toggle" type="text" placeholder="Search destinations..."
+            aria-label="Search" name="city" id="citySearch" autocomplete="off" />
 
-    <button class="btn search-btn ms-2" type="submit">
-      <i class="fa-solid fa-magnifying-glass"></i> Search
-    </button>
+          <button class="btn search-btn ms-2" type="submit">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Search</span>
+          </button>
 
-    <ul class="dropdown-menu w-100 mt-1 shadow" id="searchDropdown" style="max-height: 220px; overflow-y: auto;"></ul>
-  </form> 
-</div>
+          <ul class="search-dropdown" id="searchDropdown" style="max-height: 220px; overflow-y: auto;">
+          </ul>
+        </form>
+      </div>
+
+    </div>
 
 
-      <!-- Right: Auth Links -->
-      <ul class="navbar-nav nav-auth-links d-flex align-items-center gap-2">
+    <!-- Right: Auth Links -->
+    <ul class="navbar-nav nav-auth-links d-flex align-items-center gap-2">
+      <li class="nav-item">
+        <a class="nav-link host-link" href="/listings/new">Airbnb your home</a>
+      </li>
+
+      <% if(!currUser) { %>
         <li class="nav-item">
-          <a class="nav-link" href="/listings/new">Airbnb your home</a>
+          <a class="nav-link" href="/signup"><b>Sign up</b></a>
         </li>
-
-        <% if(!currUser) { %>
-          <li class="nav-item">
-            <a class="nav-link" href="/signup"><b>Sign up</b></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/login"><b>Login</b></a>
-          </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/login"><b>Login</b></a>
+        </li>
         <% } else { %>
           <li class="nav-item">
             <a class="nav-link" href="/logout"><b>Logout</b></a>
           </li>
-        <% } %>
-      </ul>
+          <% } %>
+    </ul>
   </div>
 </nav>
 <script>
@@ -203,55 +276,70 @@
     const dropdown = document.getElementById("searchDropdown");
     const form = document.getElementById("searchForm");
 
-    // Pass recent history from backend
-    const recentCities = <%- JSON.stringify(searchHistory || []) %>;
+    const recentCities = <% - JSON.stringify(searchHistory || []) %>;
 
-    // Render the dropdown
     function renderDropdown(list) {
-      if (!list.length) {
+      if (!list || list.length === 0) {
+        dropdown.innerHTML = "";
         dropdown.classList.remove("show");
         return;
       }
 
       dropdown.innerHTML = `
-        <li><h6 class="dropdown-header text-muted">Recent Searches</h6></li>
-        ${list.map(city => `
+      <li>
+        <h6 class="dropdown-header text-muted">
+          Recent Searches
+        </h6>
+      </li>
+
+      ${list
+          .map(
+            (city) => `
           <li>
-            <button class="dropdown-item" type="button" data-city="${city}">
-              <i class="fa-solid fa-location-dot text-danger me-2"></i>${city}
+            <button
+              class="dropdown-item"
+              type="button"
+              data-city="${city}"
+            >
+              <i class="fa-solid fa-location-dot text-danger me-2"></i>
+              ${city}
             </button>
           </li>
-        `).join("")}
-      `;
-      dropdown.classList.add("show");
+        `
+          )
+          .join("")}
+    `;
+
+      dropdown.classList.remove("show");
     }
 
-    // Show dropdown on focus (only if recent searches exist)
     searchInput.addEventListener("focus", () => {
-      if (recentCities.length) renderDropdown(recentCities);
+      renderDropdown(recentCities);
     });
 
-    // Filter dropdown when typing
     searchInput.addEventListener("input", () => {
       const value = searchInput.value.toLowerCase().trim();
-      const filtered = recentCities.filter(c => c.toLowerCase().includes(value));
+
+      const filtered = recentCities.filter((city) =>
+        city.toLowerCase().includes(value)
+      );
+
       renderDropdown(filtered);
     });
 
-    // Hide dropdown when clicking outside
     document.addEventListener("click", (e) => {
-      if (!form.contains(e.target)) dropdown.classList.remove("show");
-    });
-
-    // When user clicks a recent search
-    dropdown.addEventListener("click", (e) => {
-      const item = e.target.closest(".dropdown-item");
-      if (item) {
-        const city = item.getAttribute("data-city");
-        searchInput.value = city;
-        form.submit(); 
+      if (!form.contains(e.target)) {
+        dropdown.classList.remove("show");
       }
     });
+
+    dropdown.addEventListener("click", (e) => {
+      const item = e.target.closest(".dropdown-item");
+
+      if (!item) return;
+
+      searchInput.value = item.dataset.city;
+      form.submit();
+    });
   });
-  
 </script>
