@@ -1,0 +1,247 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+  #filters {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .filter {
+    text-align: center;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+  }
+
+  .filter:hover {
+    opacity: 1;
+    cursor: pointer;
+    transform: translateY(-2px);
+  }
+
+  .filter.active {
+    opacity: 1;
+    color: #e91e63;
+  }
+
+  .filter p {
+    font-size: 0.8rem;
+    margin: 0.5rem 0 0 0;
+  }
+
+  .filter i {
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .fill {
+    color: pink;
+  }
+
+  .fill:hover {
+    color: blue;
+  }
+
+  /* Tax info and toggle styles */
+  .tax-info {
+    display: none;
+    color: #666;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+
+  .tax-info.hidden {
+    display: none !important;
+  }
+
+  .tax-toggle {
+    border: 1px solid #ddd;
+    border-radius: 1rem;
+    height: 2.5rem;
+    padding: 0.5rem 1rem;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+
+  .tax-toggle:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+
+  .form-check-label {
+    font-size: 0.85rem;
+    margin-left: 0.5rem;
+    cursor: pointer;
+  }
+
+  .form-check-input {
+    cursor: pointer;
+  }
+
+  /* Card styles */
+  .listing-card {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+  }
+
+  .listing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  }
+
+  .listing-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .listing-link:hover {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .card-img-top {
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .listing-card:hover .card-img-top {
+    transform: scale(1.05);
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .card-text {
+    margin: 0;
+  }
+
+  .card-text b {
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  /* RESPONSIVE FILTER CONTROL */
+  @media (max-width: 768px) {
+    .hide-on-small {
+      display: none !important;
+    }
+    
+    #filters {
+      padding: 0.5rem;
+      gap: 1rem;
+    }
+    
+    .form-check-label {
+      font-size: 0.8rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .card-img-top {
+      height: 15rem !important;
+    }
+    
+    .card-text b {
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<!-- FILTERS -->
+<div id="filters" class="bg-light border-bottom">
+  <div class="filter active" data-filter="trending">
+    <div><i class="fa-solid fa-fire"></i></div>
+    <p>Trending</p>
+  </div>
+  <div class="filter" data-filter="rooms">
+    <div><i class="fa-solid fa-bed"></i></div>
+    <p>Rooms</p>
+  </div>
+  <div class="filter" data-filter="farms">
+    <div><i class="fa-solid fa-tractor"></i></div>
+    <p>Farms</p>
+  </div>
+
+  <div class="filter hide-on-small" data-filter="iconicCities">
+    <div><i class="fa-solid fa-mountain-city"></i></div>
+    <p>Iconic cities</p>
+  </div>
+  <div class="filter hide-on-small" data-filter="beach">
+    <div><i class="fa-solid fa-umbrella-beach"></i></div>
+    <p>Beach</p>
+  </div>
+  <div class="filter hide-on-small" data-filter="pools">
+    <div><i class="fa-solid fa-person-swimming"></i></div>
+    <p>Pools</p>
+  </div>
+  <div class="filter hide-on-small" data-filter="mountains">
+    <div><i class="fa-solid fa-mountain"></i></div>
+    <p>Mountains</p>
+  </div>
+  <div class="filter hide-on-small" data-filter="camping">
+    <div><i class="fa-solid fa-campground"></i></div>
+    <p>Camping</p>
+  </div>
+  <div class="filter hide-on-small" data-filter="domes">
+    <div><i class="fa-solid fa-igloo"></i></div>
+    <p>Domes</p>
+  </div>
+  <div class="filter hide-on-small" data-filter="bedAndBreakfast">
+    <div><i class="fa-solid fa-mug-saucer"></i></div>
+    <p>Bed & Breakfast</p>
+  </div>
+  
+
+<!-- listings -->
+<div class="container-fluid mt-4">
+  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-4">
+    <% allListings.forEach(listing => { %>
+      <div class="col">
+        <div class="card h-100 shadow-sm">
+          <a href="/listings/<%= listing._id %>" class="text-decoration-none text-dark">
+            <img 
+              src="<%= listing.image.url %>" 
+              class="card-img-top" 
+              alt="<%= listing.title %>"
+              style="height: 18rem; object-fit: cover;"
+            />
+            <div class="card-body">
+              <h5 class="card-title mb-1"><%= listing.title %></h5>
+              <p class="card-text text-muted mb-2"><%= listing.location %>, <%= listing.country %></p>
+              <p class="fw-bold mb-0">₹<%= listing.price.toLocaleString("en-IN") %> / night</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+
+<script>
+  document.querySelectorAll('.filter').forEach(filter => {
+    filter.addEventListener('click', () => {
+      const selectedCategory = filter.getAttribute('data-filter');
+
+      //redirect with category
+      window.location.href = `/listings?category=${selectedCategory}`;
+    });
+  });
+
+  const currentCategory = "<%= category || '' %>";
+  if(currentCategory){
+    const activeFilter = document.querySelector(`[data-filter="${currentCategory}"]`);
+    if(activeFilter) activeFilter.classList.add('active');
+  }
+
+</script>
