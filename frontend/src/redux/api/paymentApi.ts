@@ -37,6 +37,15 @@ export interface VerifySignatureResponse {
   message: string;
 }
 
+export interface CancelOrderRequest {
+  bookingId: string;
+}
+
+export interface CancelOrderResponse {
+  success: boolean;
+  message: string;
+}
+
 export const paymentApi = createApi({
   reducerPath: "paymentApi",
   baseQuery: axiosBaseQuery(),
@@ -55,10 +64,18 @@ export const paymentApi = createApi({
         data: paymentData,
       }),
     }),
+    cancelOrder: builder.mutation<CancelOrderResponse, CancelOrderRequest>({
+      query: (bookingData) => ({
+        url: API_ENDPOINTS.PAYMENT.CANCEL_ORDER,
+        method: "POST",
+        data: bookingData,
+      }),
+    }),
   }),
 });
 
 export const {
   useCreateOrderMutation,
   useVerifySignatureMutation,
+  useCancelOrderMutation,
 } = paymentApi;

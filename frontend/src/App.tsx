@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Navbar } from './components/Navbar';
 import { ListingModal } from './components/ListingModal';
 import { ListingShow } from './components/ListingShow';
@@ -6,16 +7,19 @@ import { AuthModal } from './components/AuthModal';
 import { WishlistModal } from './components/WishlistModal';
 import { BookingsModal } from './components/BookingsModal';
 import { CategoryFilter } from './components/CategoryFilter';
+import { ListingCard } from './components/ListingCard';
+import { Reveal } from './components/Reveal';
 import { authService, listingService } from './services';
 import { useGetListingsQuery } from './redux/api/listingApi';
 import type { Listing } from './types/listing';
-import { ArrowUpDown, X, ChevronDown, Check, RotateCcw, Heart, Star } from 'lucide-react';
+import { ArrowUpDown, X, ChevronDown, Check, RotateCcw, Heart, Sparkles } from 'lucide-react';
 import { Pagination } from './components/Pagination';
 import { CitySplitMap } from './components/CitySplitMap';
 import { formatStandardDateRange } from './utils/dateFormatter';
+import { EASE_SUBTLE } from './utils/motion';
 
 const SORT_OPTIONS = [
-  { value: '', label: 'Default (Recommended)' },
+  { value: '', label: 'Recommended' },
   { value: 'price_asc', label: 'Price: Low to High' },
   { value: 'price_desc', label: 'Price: High to Low' },
   { value: 'newest', label: 'Newest First' },
@@ -207,7 +211,7 @@ export function App() {
     (guests > 0 ? 1 : 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+    <div className="stay-page-bg flex min-h-screen flex-col font-sans">
       <Navbar
         user={user}
         onOpenCreateModal={() => setIsCreateModalOpen(true)}
@@ -235,109 +239,134 @@ export function App() {
         }}
       />
 
-      <main
-        className="flex-1 w-full mx-auto pt-0 pb-6 px-6 sm:px-8 lg:px-12 xl:px-14 2xl:px-16 max-w-[1920px] transition-all duration-200"
-      >
-        {/* Categories Bar */}
-        <CategoryFilter
-          selectedCategory={selectedCategory}
-          onSelectCategory={handleCategorySelect}
-        />
-
-        {/* Header & Controls Bar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-xl sm:text-3xl font-bold text-gray-900">
-              {searchCity ? `Stays in "${searchCity}"` : 'Explore Stays'}
-              {checkIn && checkOut && (
-                <span className="text-sm sm:text-base font-normal text-gray-500 ml-2">
-                  ({formatStandardDateRange(checkIn, checkOut)})
-                </span>
-              )}
-            </h1>
-            <p className="text-gray-500 text-sm mt-1">
-              {totalListings} {totalListings === 1 ? 'stay' : 'stays'} available
-              {selectedCategory && ` • Category: ${selectedCategory}`}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-            {activeFilterCount > 0 && (
-              <button
-                type="button"
-                onClick={clearAllFilters}
-                className="group flex items-center gap-2 bg-white hover:bg-rose-50/70 border border-gray-200 hover:border-rose-200 text-gray-700 hover:text-[#fe424d] px-3.5 py-2 rounded-xl text-xs font-semibold shadow-xs hover:shadow-sm transition-all duration-200 cursor-pointer"
-                title="Reset all filters"
-              >
-                <RotateCcw className="w-3.5 h-3.5 text-gray-400 group-hover:text-[#fe424d] group-hover:-rotate-45 transition-transform duration-200" />
-                <span>Reset</span>
-                <span className="flex items-center justify-center min-w-[18px] h-4.5 px-1 bg-rose-100 text-[#fe424d] text-[10px] font-bold rounded-full">
-                  {activeFilterCount}
-                </span>
-              </button>
-            )}
-
-            {/* Custom Matching Dimension Sorting Dropdown */}
-            <div className="relative" ref={sortRef}>
-              <button
-                type="button"
-                onClick={() => setIsSortOpen((prev) => !prev)}
-                className="flex items-center justify-between gap-2.5 bg-white border border-gray-200 hover:border-gray-300 rounded-xl px-3.5 py-2 shadow-xs cursor-pointer min-w-[210px] transition text-left focus:outline-none focus:ring-2 focus:ring-gray-200"
-                aria-haspopup="listbox"
-                aria-expanded={isSortOpen}
-              >
-                <div className="flex items-center gap-2 truncate">
-                  <ArrowUpDown className="w-4 h-4 text-gray-500 shrink-0" />
-                  <span className="text-xs text-gray-500 font-medium hidden sm:inline">Sort:</span>
-                  <span className="text-xs font-semibold text-gray-800 truncate">
-                    {selectedSortOption.label}
-                  </span>
-                </div>
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 shrink-0 ${isSortOpen ? 'rotate-180 text-gray-700' : ''
-                    }`}
-                />
-              </button>
-
-              {isSortOpen && (
-                <div
-                  className="absolute right-0 top-full mt-1.5 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-50 py-1.5 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150"
-                  role="listbox"
-                >
-                  {SORT_OPTIONS.map((option) => {
-                    const isSelected = selectedSort === option.value;
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => {
-                          handleSortChange(option.value);
-                          setIsSortOpen(false);
-                        }}
-                        className={`w-full flex items-center justify-between px-3.5 py-2 text-xs text-left transition cursor-pointer ${isSelected
-                          ? 'bg-rose-50 text-[#fe424d] font-semibold'
-                          : 'text-gray-700 hover:bg-gray-50 font-medium'
-                          }`}
-                        role="option"
-                        aria-selected={isSelected}
-                      >
-                        <span className="truncate">{option.label}</span>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-[#fe424d] shrink-0 ml-2" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+      <main className="mx-auto w-full max-w-[1920px] flex-1 px-4 pb-6 pt-5 sm:px-8 sm:pt-7 lg:px-12 xl:px-14 2xl:px-16">
+        <Reveal className={`relative ${isSortOpen ? 'z-40' : 'z-0'}`}>
+          <section className="relative rounded-[26px] border border-white/70 bg-white/75 p-5 shadow-[0_1px_2px_rgba(28,25,23,0.04),0_18px_50px_-30px_rgba(28,25,23,0.35)] backdrop-blur-sm sm:p-7">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 overflow-hidden rounded-[26px]"
+            >
+              <div className="absolute -right-16 -top-24 h-64 w-64 rounded-full bg-[#fe424d]/10 blur-3xl" />
+              <div className="absolute -bottom-24 left-16 h-56 w-56 rounded-full bg-amber-200/20 blur-3xl" />
             </div>
-          </div>
-        </div>
+
+            <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-2xl">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-100 bg-rose-50/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#fe424d]">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Handpicked escapes
+                </span>
+                <h1 className="mt-3 text-[26px] font-bold leading-tight tracking-tight text-gray-900 sm:text-4xl">
+                  {searchCity ? `Stays in "${searchCity}"` : 'Find a stay that feels like yours'}
+                </h1>
+                <p className="mt-2 text-sm leading-relaxed text-gray-500">
+                  {totalListings} {totalListings === 1 ? 'stay' : 'stays'} available
+                  {selectedCategory && ` • ${selectedCategory}`}
+                  {checkIn && checkOut && ` • ${formatStandardDateRange(checkIn, checkOut)}`}
+                </p>
+              </div>
+
+              <div className="flex w-full items-center gap-3 sm:w-auto sm:justify-end">
+                {activeFilterCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={clearAllFilters}
+                    className="group flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:border-rose-200 hover:bg-rose-50/70 hover:text-[#fe424d] hover:shadow-md cursor-pointer"
+                    title="Reset all filters"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5 text-gray-400 transition-transform duration-200 group-hover:-rotate-45 group-hover:text-[#fe424d]" />
+                    <span>Reset</span>
+                    <span className="flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-rose-100 px-1 text-[10px] font-bold text-[#fe424d]">
+                      {activeFilterCount}
+                    </span>
+                  </button>
+                )}
+
+                {/* Custom Matching Dimension Sorting Dropdown */}
+                <div className="relative z-20 min-w-0 flex-1 sm:flex-none" ref={sortRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsSortOpen((prev) => !prev)}
+                    className="flex w-full min-w-0 cursor-pointer items-center justify-between gap-2.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-left shadow-sm transition hover:border-gray-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-200 sm:min-w-[220px]"
+                    aria-haspopup="listbox"
+                    aria-expanded={isSortOpen}
+                  >
+                    <div className="flex min-w-0 flex-1 items-center gap-2">
+                      <ArrowUpDown className="h-4 w-4 shrink-0 text-gray-500" />
+                      <span className="hidden shrink-0 text-xs font-medium text-gray-500 sm:inline">Sort:</span>
+                      <span className="min-w-0 truncate text-xs font-semibold text-gray-800">
+                        {selectedSortOption.label}
+                      </span>
+                    </div>
+                    <ChevronDown
+                      className={`h-3.5 w-3.5 shrink-0 text-gray-400 transition-transform duration-200 ${
+                        isSortOpen ? 'rotate-180 text-gray-700' : ''
+                      }`}
+                    />
+                  </button>
+
+                  <AnimatePresence>
+                    {isSortOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                        transition={{ duration: 0.18, ease: EASE_SUBTLE }}
+                        className="absolute right-0 top-full z-50 mt-2 w-full origin-top overflow-hidden rounded-2xl border border-gray-200 bg-white py-1.5 shadow-xl sm:min-w-[220px]"
+                        role="listbox"
+                      >
+                        {SORT_OPTIONS.map((option) => {
+                          const isSelected = selectedSort === option.value;
+                          return (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => {
+                                handleSortChange(option.value);
+                                setIsSortOpen(false);
+                              }}
+                              className={`flex w-full cursor-pointer items-center justify-between gap-2 px-3.5 py-2.5 text-left text-xs transition ${
+                                isSelected
+                                  ? 'bg-rose-50 font-semibold text-[#fe424d]'
+                                  : 'font-medium text-gray-700 hover:bg-gray-50'
+                              }`}
+                              role="option"
+                              aria-selected={isSelected}
+                            >
+                              <span className="truncate">{option.label}</span>
+                              {isSelected && <Check className="h-3.5 w-3.5 shrink-0 text-[#fe424d]" />}
+                            </button>
+                          );
+                        })}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
+          </section>
+        </Reveal>
+
+        <Reveal delay={0.06} className="mt-5">
+          <CategoryFilter
+            selectedCategory={selectedCategory}
+            onSelectCategory={handleCategorySelect}
+          />
+        </Reveal>
 
         {/* Active Filter Chips */}
-        {activeFilterCount > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mb-6 animate-in fade-in duration-200">
-            <span className="text-xs font-medium text-gray-400 mr-1">Active filters:</span>
+        <AnimatePresence initial={false}>
+          {activeFilterCount > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.25, ease: EASE_SUBTLE }}
+              className="mb-6 flex flex-wrap items-center gap-2"
+            >
+              <span className="mr-1 text-xs font-medium text-gray-400">Active filters:</span>
             {searchCity.trim() && (
-              <span className="inline-flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-xs px-2.5 py-1 rounded-lg shadow-2xs font-medium">
+              <span className="inline-flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded-full shadow-sm font-medium">
                 <span>City: <strong className="text-gray-900 font-semibold">{searchCity.trim()}</strong></span>
                 <button
                   type="button"
@@ -350,7 +379,7 @@ export function App() {
               </span>
             )}
             {selectedCategory && (
-              <span className="inline-flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-xs px-2.5 py-1 rounded-lg shadow-2xs font-medium">
+              <span className="inline-flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded-full shadow-sm font-medium">
                 <span>Category: <strong className="text-gray-900 font-semibold">{selectedCategory}</strong></span>
                 <button
                   type="button"
@@ -363,7 +392,7 @@ export function App() {
               </span>
             )}
             {checkIn && checkOut && (
-              <span className="inline-flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-xs px-2.5 py-1 rounded-lg shadow-2xs font-medium">
+              <span className="inline-flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded-full shadow-sm font-medium">
                 <span>Dates: <strong className="text-gray-900 font-semibold">{formatStandardDateRange(checkIn, checkOut)}</strong></span>
                 <button
                   type="button"
@@ -379,7 +408,7 @@ export function App() {
               </span>
             )}
             {guests > 0 && (
-              <span className="inline-flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-xs px-2.5 py-1 rounded-lg shadow-2xs font-medium">
+              <span className="inline-flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded-full shadow-sm font-medium">
                 <span>Guests: <strong className="text-gray-900 font-semibold">{guests} {guests === 1 ? 'guest' : 'guests'}</strong></span>
                 <button
                   type="button"
@@ -394,30 +423,37 @@ export function App() {
                 </button>
               </span>
             )}
-            <button
-              type="button"
-              onClick={clearAllFilters}
-              className="text-xs text-[#fe424d] hover:underline font-semibold ml-1 cursor-pointer"
-            >
-              Clear all
-            </button>
-          </div>
-        )}
+              <button
+                type="button"
+                onClick={clearAllFilters}
+                className="ml-1 cursor-pointer text-xs font-semibold text-[#fe424d] hover:underline"
+              >
+                Clear all
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Loading & Error States */}
         {isLoading && (
-          <div className="flex justify-center items-center py-20 text-gray-500">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#fe424d] mr-3"></div>
-            Loading listings...
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+            {Array.from({ length: 10 }).map((_, index) => (
+              <div key={index} className="flex flex-col">
+                <div className="stay-skeleton mb-3 aspect-[16/11] rounded-2xl" />
+                <div className="stay-skeleton mb-2 h-3.5 w-3/4 rounded-full" />
+                <div className="stay-skeleton mb-1.5 h-3 w-1/2 rounded-full" />
+                <div className="stay-skeleton h-4 w-1/3 rounded-full" />
+              </div>
+            ))}
           </div>
         )}
 
         {isError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-center my-6">
+          <div className="my-6 rounded-2xl border border-red-200 bg-red-50 p-6 text-center text-red-700 shadow-sm">
             <p className="font-semibold">Failed to load listings from server.</p>
             <button
               onClick={() => refetch()}
-              className="mt-2 text-sm underline text-red-600 hover:text-red-800 cursor-pointer"
+              className="mt-2 cursor-pointer text-sm font-semibold text-red-600 underline hover:text-red-800"
             >
               Try Again
             </button>
@@ -425,12 +461,17 @@ export function App() {
         )}
 
         {!isLoading && !isError && listings.length === 0 && (
-          <div className="text-center py-16 text-gray-500 bg-white rounded-2xl border border-gray-100 p-8">
-            <p className="text-lg font-medium text-gray-700">No listings found matching your criteria.</p>
-            <p className="text-sm text-gray-400 mt-1">Try resetting filters or searching for another destination.</p>
+          <div className="rounded-3xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-[#fe424d]">
+              <Sparkles className="h-6 w-6" />
+            </div>
+            <p className="mt-4 text-lg font-semibold text-gray-800">No stays match those filters yet.</p>
+            <p className="mt-1 text-sm text-gray-500">
+              Try resetting filters or searching for another destination.
+            </p>
             <button
               onClick={clearAllFilters}
-              className="mt-4 inline-flex items-center gap-2 bg-[#fe424d] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#e03a45] transition cursor-pointer shadow-sm"
+              className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#fe424d] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#e03a45] hover:shadow-md"
             >
               Reset Filters
             </button>
@@ -445,82 +486,19 @@ export function App() {
               {/* Left Column: Listing Cards & Pagination */}
               <div className="w-full lg:w-[54%] xl:w-[56%] shrink-0 flex flex-col justify-between">
                 <div>
-                  <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
                     {listings.map((listing, index) => (
-                      <div
+                      <ListingCard
                         key={listing._id}
-                        onClick={() => setSelectedListing(listing)}
-                        onMouseEnter={() => setHoveredListingId(listing._id)}
-                        onMouseLeave={() => setHoveredListingId(null)}
-                        className={`group cursor-pointer flex flex-col transition-all duration-200 ${hoveredListingId === listing._id ? '-translate-y-1' : ''
-                          }`}
-                      >
-                        {/* Compact Reduced-Height Image Container */}
-                        <div
-                          className={`relative aspect-[16/11] sm:aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 mb-2 transition-all duration-200 ${hoveredListingId === listing._id
-                              ? 'shadow-md ring-2 ring-gray-900/10'
-                              : 'shadow-xs group-hover:shadow-sm'
-                            }`}
-                        >
-                          <img
-                            src={
-                              listing.image?.url ||
-                              'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80'
-                            }
-                            alt={listing.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                          />
-                          {/* Guest favourite badge */}
-                          {index % 2 === 0 && (
-                            <div className="absolute top-2 left-2 bg-white/95 backdrop-blur-xs text-gray-900 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1 z-10 pointer-events-none">
-                              <span>Guest favourite</span>
-                            </div>
-                          )}
-                          {/* Real Database Wishlist Heart Button - Increased Size */}
-                          <button
-                            type="button"
-                            onClick={(e) => toggleFavorite(listing._id, e)}
-                            className="absolute top-2 right-2 text-white hover:scale-115 active:scale-90 transition-transform z-10 drop-shadow-md cursor-pointer p-1.5 rounded-full hover:bg-black/10"
-                            title={favorites[listing._id] ? "Saved in wishlist" : "Add to wishlist"}
-                            aria-label={favorites[listing._id] ? "Saved in wishlist" : "Add to wishlist"}
-                          >
-                            <Heart
-                              className={`w-6 h-6 transition-colors ${favorites[listing._id]
-                                  ? 'fill-[#fe424d] text-[#fe424d]'
-                                  : 'fill-black/35 text-white stroke-[2]'
-                                }`}
-                            />
-                          </button>
-                        </div>
-
-                        {/* Extracted Details Below Image */}
-                        <div className="flex flex-col gap-0.5 px-0.5">
-                          <div className="flex items-center justify-between gap-1">
-                            <h3 className="font-semibold text-gray-900 text-[13px] truncate">
-                              {listing.location}, {listing.country}
-                            </h3>
-                            {/* Real Rating System */}
-                            {listing.avgRating !== null && listing.avgRating !== undefined ? (
-                              <div className="flex items-center gap-1 text-xs font-semibold text-gray-900 shrink-0">
-                                <Star className="w-3 h-3 fill-current text-gray-900" />
-                                <span>{Number(listing.avgRating).toFixed(1)}</span>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-0.5 text-xs font-medium text-gray-500 shrink-0">
-                                <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                                <span className="font-semibold text-gray-800 text-[11px]">New</span>
-                              </div>
-                            )}
-                          </div>
-                          <p className="text-gray-500 text-xs truncate">{listing.title}</p>
-                          <div className="mt-1 flex items-baseline gap-1">
-                            <span className="font-semibold text-gray-900 text-[13px]">
-                              ₹{listing.price?.toLocaleString('en-IN') || listing.price}
-                            </span>
-                            <span className="text-gray-500 text-[11px] font-normal">night</span>
-                          </div>
-                        </div>
-                      </div>
+                        listing={listing}
+                        index={index}
+                        compact
+                        isFavorite={Boolean(favorites[listing._id])}
+                        isHighlighted={hoveredListingId === listing._id}
+                        onOpen={() => setSelectedListing(listing)}
+                        onToggleFavorite={(e) => toggleFavorite(listing._id, e)}
+                        onHoverChange={setHoveredListingId}
+                      />
                     ))}
                   </div>
                 </div>
@@ -552,77 +530,16 @@ export function App() {
           ) : (
             /* Compact Cards Grid utilizing full side space with extracted details below image */
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-x-4 sm:gap-x-4.5 gap-y-6 sm:gap-y-7">
+              <div className="grid grid-cols-1 gap-x-4 gap-y-7 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 {listings.map((listing, index) => (
-                  <div
+                  <ListingCard
                     key={listing._id}
-                    onClick={() => setSelectedListing(listing)}
-                    className="group cursor-pointer flex flex-col transition-all duration-200 hover:-translate-y-0.5"
-                  >
-                    {/* Compact Image Container with reduced box height and real wishlist heart */}
-                    <div className="relative aspect-[16/11] rounded-xl overflow-hidden bg-gray-100 mb-2 shadow-xs group-hover:shadow-sm transition-all duration-300">
-                      <img
-                        src={
-                          listing.image?.url ||
-                          'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80'
-                        }
-                        alt={listing.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
-                        loading="lazy"
-                      />
-
-                      {/* Guest Favourite Badge */}
-                      {index % 3 === 0 && (
-                        <div className="absolute top-2.5 left-2.5 bg-white/95 backdrop-blur-xs text-gray-900 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1 z-10 pointer-events-none">
-                          <span>Guest favourite</span>
-                        </div>
-                      )}
-
-                      {/* Real Database Wishlist Heart Button - Increased Size */}
-                      <button
-                        type="button"
-                        onClick={(e) => toggleFavorite(listing._id, e)}
-                        className="absolute top-2.5 right-2.5 text-white hover:scale-115 active:scale-90 transition-transform z-10 drop-shadow-md cursor-pointer p-1.5 rounded-full hover:bg-black/10"
-                        title={favorites[listing._id] ? "Saved in wishlist" : "Add to wishlist"}
-                        aria-label={favorites[listing._id] ? "Saved in wishlist" : "Add to wishlist"}
-                      >
-                        <Heart
-                          className={`w-6 h-6 transition-colors ${favorites[listing._id]
-                              ? 'fill-[#fe424d] text-[#fe424d]'
-                              : 'fill-black/35 text-white stroke-[2]'
-                            }`}
-                        />
-                      </button>
-                    </div>
-
-                    {/* Extracted Details Below Image */}
-                    <div className="flex flex-col gap-0.5 px-0.5">
-                      <div className="flex items-center justify-between gap-1">
-                        <h3 className="font-semibold text-gray-900 text-[13px] truncate">
-                          {listing.location}, {listing.country}
-                        </h3>
-                        {/* Real Rating System */}
-                        {listing.avgRating !== null && listing.avgRating !== undefined ? (
-                          <div className="flex items-center gap-1 text-xs font-semibold text-gray-900 shrink-0">
-                            <Star className="w-3 h-3 fill-current text-gray-900" />
-                            <span>{Number(listing.avgRating).toFixed(1)}</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-0.5 text-xs font-medium text-gray-500 shrink-0">
-                            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                            <span className="font-semibold text-gray-800 text-[11px]">New</span>
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-gray-500 text-xs truncate">{listing.title}</p>
-                      <div className="mt-1 flex items-baseline gap-1">
-                        <span className="font-semibold text-gray-900 text-[13px]">
-                          ₹{listing.price?.toLocaleString('en-IN') || listing.price}
-                        </span>
-                        <span className="text-gray-500 text-[11px] font-normal">night</span>
-                      </div>
-                    </div>
-                  </div>
+                    listing={listing}
+                    index={index}
+                    isFavorite={Boolean(favorites[listing._id])}
+                    onOpen={() => setSelectedListing(listing)}
+                    onToggleFavorite={(e) => toggleFavorite(listing._id, e)}
+                  />
                 ))}
               </div>
 
@@ -641,12 +558,20 @@ export function App() {
       </main>
 
       {/* Floating Wishlist Micro-Toast Notification */}
-      {wishlistToast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900/95 backdrop-blur-xs text-white text-xs sm:text-sm font-medium px-4 py-2.5 rounded-full shadow-xl flex items-center gap-2 animate-bounce-in border border-gray-800">
-          <Heart className="w-3.5 h-3.5 fill-[#fe424d] text-[#fe424d]" />
-          <span>{wishlistToast.message}</span>
-        </div>
-      )}
+      <AnimatePresence>
+        {wishlistToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 14, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.96 }}
+            transition={{ duration: 0.28, ease: EASE_SUBTLE }}
+            className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-gray-800 bg-gray-900/95 px-4 py-2.5 text-xs font-medium text-white shadow-2xl backdrop-blur-sm sm:text-sm"
+          >
+            <Heart className="h-3.5 w-3.5 fill-[#fe424d] text-[#fe424d]" />
+            <span>{wishlistToast.message}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Detail / Booking Full Page View */}
       {selectedListing && (
@@ -663,8 +588,14 @@ export function App() {
         </div>
       )}
 
-      <footer className="bg-white border-t border-gray-200 py-6 text-center text-sm text-gray-500 mt-6">
-        <p>© 2026 Stay-Go Inc. All rights reserved.</p>
+      <footer className="mt-10 border-t border-black/5 bg-white/70 py-7 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-[1920px] flex-col items-center justify-between gap-2 px-6 text-xs text-gray-500 sm:flex-row sm:px-8 lg:px-12">
+          <p>© 2026 Stay-Go Inc. All rights reserved.</p>
+          <p className="flex items-center gap-1.5">
+            <Sparkles className="h-3.5 w-3.5 text-[#fe424d]" />
+            Thoughtfully curated stays
+          </p>
+        </div>
       </footer>
 
       {/* Create Listing Modal */}
@@ -685,6 +616,7 @@ export function App() {
 
       {/* Authentication Modal */}
       <AuthModal
+        key={`${authModalState.mode}-${authModalState.isOpen}`}
         isOpen={authModalState.isOpen}
         initialMode={authModalState.mode}
         onClose={() => setAuthModalState({ ...authModalState, isOpen: false })}

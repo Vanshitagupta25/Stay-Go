@@ -3,14 +3,7 @@
     margin-left: 2rem;
   }
 
-  .search-btn {
-    background-color: #fe424d;
-    color: #fff;
-    border-radius: 25px;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    margin-left: 6px;
-  }
+
   .search-dropdown {
   position: absolute;
   top: calc(100% + 6px);
@@ -31,20 +24,19 @@
 .search-dropdown.show {
   display: block;
 }
-
-  .search-btn:hover {
-    background-color: #e73b45;
-    color: #fff;
-  }
-
-  .search-btn i {
-    display: inline;
-    margin-right: 0.5rem;
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #717171;
+    z-index: 10;
+    pointer-events: none;
   }
 
   .search-inp {
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
     font-size: 0.9rem;
     width: 250px;
     border: 1px solid #ccc;
@@ -103,116 +95,69 @@
     .navbar {
       padding: 0.5rem 0;
     }
-
     .navbar-brand {
       margin-right: 1rem;
     }
-
     .navbar-nav {
       margin-left: 0;
       flex-direction: row;
       flex-wrap: wrap;
       gap: 0.5rem;
     }
-
-
-
-    form.d-flex {
-      flex-direction: row;
-      width: 100%;
-    }
-
-    .search-inp {
-      width: 100%;
-      border-radius: 999px;
-      padding: 0.75rem 1rem;
-    }
-
-    .search-btn {
-      border-radius: 999px;
-      white-space: nowrap;
-    }
-
     .nav-auth-links {
       margin-left: auto;
       display: flex;
       gap: 0.5rem;
     }
-
-    .search-results {
-      width: 100%;
-      left: 0;
-    }
-  }
-
-  @media (max-width: 991px) {
-
-    .navbar .container {
-      gap: 1rem;
-    }
-
-    .search-wrapper {
-      order: 3;
-      width: 100%;
-      max-width: 100%;
-      margin: 0;
-    }
-
-    #searchForm {
-      width: 100%;
-    }
-
-    .search-inp {
-      width: 100%;
-    }
-
-    .nav-auth-links {
-      gap: 0.5rem;
-    }
-
     .nav-auth-links .nav-link {
       padding: 0.25rem 0.5rem;
       font-size: 0.9rem;
     }
-
-    .host-link {
-      display: none;
+    .search-wrapper {
+      margin: 0 1rem;
     }
   }
 
   @media (max-width: 576px) {
-
     .navbar-brand i {
       font-size: 1.5rem;
     }
-
-    .search-btn {
-      width: auto;
-      padding: 0.6rem 0.9rem;
-    }
-
-    .search-btn span {
-      display: none;
-    }
-
-    .search-btn i {
-      margin-right: 0;
-    }
-
     .nav-auth-links {
       gap: 0;
     }
-
     .nav-auth-links .nav-link {
       font-size: 0.85rem;
     }
-
     .explore-link {
       display: none;
     }
-
+    .host-link {
+      display: none !important;
+    }
+    .search-wrapper {
+      order: 3;
+      width: 100%;
+      margin: 0.5rem 0 0 0;
+    }
+    #searchForm, form.d-flex {
+      width: 100%;
+    }
     .search-inp {
-      font-size: 0.85rem;
+      width: 100%;
+      font-size: 0.8rem;
+      padding: 0.6rem 0.5rem 0.6rem 2.2rem;
+    }
+    .search-icon {
+      position: absolute;
+      left: 0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      color: #717171;
+      pointer-events: none;
+    }
+    .search-results {
+      width: 100%;
     }
   }
 </style>
@@ -230,16 +175,13 @@
       <a class="nav-link explore-link" href="/listings">Explore</a>
     </div>
 
-    <div class="flex-grow-1 d-flex justify-content-center">
+    <div class="flex-grow-1 d-flex justify-content-end me-md-4">
       <div class="search-wrapper">
         <form class="d-flex position-relative dropdown" role="search" action="/listings" method="GET" id="searchForm">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
           <input class="form-control search-inp dropdown-toggle" type="text" placeholder="Search destinations..."
             aria-label="Search" name="city" id="citySearch" autocomplete="off" />
 
-          <button class="btn search-btn ms-2" type="submit">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <span>Search</span>
-          </button>
 
           <ul class="search-dropdown" id="searchDropdown" style="max-height: 220px; overflow-y: auto;">
           </ul>
@@ -252,10 +194,14 @@
     <!-- Right: Auth Links -->
     <ul class="navbar-nav nav-auth-links d-flex align-items-center gap-2">
       <li class="nav-item">
-        <a class="nav-link host-link" href="/listings/new">Airbnb your home</a>
+        <% if (locals.currUser) { %>
+          <a class="nav-link host-link" href="#" data-bs-toggle="modal" data-bs-target="#createListingModal">Host on Stay-Go</a>
+        <% } else { %>
+          <a class="nav-link host-link" href="/login">Host on Stay-Go</a>
+        <% } %>
       </li>
 
-      <% if(!currUser) { %>
+      <% if(!locals.currUser) { %>
         <li class="nav-item">
           <a class="nav-link" href="/signup"><b>Sign up</b></a>
         </li>
@@ -270,13 +216,35 @@
     </ul>
   </div>
 </nav>
+
+<!-- Include Create Listing Modal -->
+<% if (locals.currUser) { %>
+  <%- include('listingModal.ejs', { isEdit: false, listing: {} }) %>
+<% } else { %>
+  <!-- If not logged in, we could trigger a login redirect or just show login flash. -->
+  <!-- Actually the host-link should ideally redirect to login if not logged in.
+       We can handle this by only showing the modal toggle if currUser is present. -->
+<% } %>
+
+<!-- Mobile FAB for Create Listing -->
+<div class="fab-container position-fixed">
+  <% if (locals.currUser) { %>
+    <button type="button" data-bs-toggle="modal" data-bs-target="#createListingModal" class="btn rounded-circle shadow-lg d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background-color: #fe424d; color: white; border: none;">
+      <i class="fa-solid fa-plus fs-5"></i>
+    </button>
+  <% } else { %>
+    <a href="/login" class="btn rounded-circle shadow-lg d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background-color: #fe424d; color: white; border: none; text-decoration: none;">
+      <i class="fa-solid fa-plus fs-5"></i>
+    </a>
+  <% } %>
+</div>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const searchInput = document.getElementById("citySearch");
     const dropdown = document.getElementById("searchDropdown");
     const form = document.getElementById("searchForm");
 
-    const recentCities = <% - JSON.stringify(searchHistory || []) %>;
+    const recentCities = <%- JSON.stringify(locals.searchHistory || []) %>;
 
     function renderDropdown(list) {
       if (!list || list.length === 0) {

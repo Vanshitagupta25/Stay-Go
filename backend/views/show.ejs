@@ -27,9 +27,9 @@
     </div>
     <br/>
 
- <% if(currUser && listing.owner._id.equals(currUser._id)) { %>
+ <% if(locals.currUser && listing.owner._id.equals(locals.currUser._id)) { %>
    <div class="btns">
-     <a href="/listings/<%=listing._id%>/edit" 
+     <a href="#" data-bs-toggle="modal" data-bs-target="#editListingModal" 
      class="btn btn-dark col-1 offset-3 edit-btn">Edit</a>
   
      <form method="POST" action="/listings/<%=listing._id%>?_method=DELETE">
@@ -38,7 +38,7 @@
    </div>
   <% } %>
  
-  <% if(currUser) { %>
+  <% if(locals.currUser) { %>
    <div class="col-8 offset-3 mb-3">
      <h4>Leave a Review</h4>
      <form 
@@ -109,3 +109,7 @@
 
 </div>
 <script src="/js/map.js"></script>
+
+<% if(currUser && listing.owner._id.equals(currUser._id)) { %>
+  <%- include('./includes/listingModal.ejs', { isEdit: true, listing: listing }) %>
+<% } %>

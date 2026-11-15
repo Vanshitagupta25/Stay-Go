@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { LogOut, X } from 'lucide-react';
+import { ModalPortal } from './ModalPortal';
 
 export interface LogoutModalProps {
   isOpen: boolean;
@@ -51,17 +52,18 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
   const initial = (username || email || 'U').trim().charAt(0).toUpperCase();
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !isSubmitting) {
-          onClose();
-        }
-      }}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="logout-modal-title"
-    >
+    <ModalPortal>
+      <div
+        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
+        onClick={(e) => {
+          if (e.target === e.currentTarget && !isSubmitting) {
+            onClose();
+          }
+        }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="logout-modal-title"
+      >
       <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-gray-100 relative animate-in zoom-in-95 fade-in duration-200">
         
         {/* Close Button */}
@@ -144,6 +146,7 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
         </div>
 
       </div>
-    </div>
+      </div>
+    </ModalPortal>
   );
 };

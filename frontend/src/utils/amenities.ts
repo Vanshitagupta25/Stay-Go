@@ -115,8 +115,7 @@ export function getAmenitiesForVilla(listing?: Listing | null): AmenityDefinitio
   if (!listing) return [];
 
   // 1. Explicit amenities defined on the villa
-  if (Array.isArray(listing.amenities)) {
-    if (listing.amenities.length === 0) return [];
+  if (Array.isArray(listing.amenities) && listing.amenities.length > 0) {
     const result: AmenityDefinition[] = [];
     for (const raw of listing.amenities) {
       const key = normalizeAmenityKey(raw);

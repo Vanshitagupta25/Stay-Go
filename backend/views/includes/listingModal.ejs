@@ -1,0 +1,92 @@
+<!-- listingModal.ejs -->
+<% 
+  const modalId = isEdit ? 'editListingModal' : 'createListingModal';
+  const formAction = isEdit ? `/listings/${listing._id}?_method=PUT` : '/listings';
+  const modalTitle = isEdit ? 'Edit Listing' : 'Host on Stay-Go';
+  const submitText = isEdit ? 'Save Changes' : 'Create Listing';
+  
+  // Safe defaults
+  const l = listing || {};
+%>
+
+<div class="modal fade" id="<%= modalId %>" tabindex="-1" aria-labelledby="<%= modalId %>Label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+      
+      <!-- Modal Header -->
+      <div class="modal-header border-bottom-0 pb-0 pt-3 pt-md-4 px-3 px-md-5">
+        <h5 class="modal-title fw-bold fs-5" id="<%= modalId %>Label"><%= modalTitle %></h5>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close" style="background-color: #f1f3f5; border-radius: 50%; padding: 0.8rem;"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body px-3 px-md-5 py-3 py-md-4">
+        <form action="<%= formAction %>" method="POST" novalidate class="needs-validation" enctype="multipart/form-data">
+          
+          <div class="mb-4">
+            <label for="title" class="form-label fw-semibold text-muted small text-uppercase">Title</label>
+            <input name="listing[title]" type="text" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" value="<%= l.title || '' %>" placeholder="e.g. Cozy Beachfront Villa" required>
+            <div class="invalid-feedback">Please enter a valid title.</div>
+          </div>
+
+          <div class="mb-4">
+            <label for="description" class="form-label fw-semibold text-muted small text-uppercase">Description</label>
+            <textarea name="listing[description]" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px; resize: none;" rows="3" placeholder="Tell guests about your place..."><%= l.description || '' %></textarea>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-12 col-md-6 mb-4 mb-md-0">
+              <label for="image" class="form-label fw-semibold text-muted small text-uppercase"><%= isEdit ? 'Upload New Image' : 'Upload Image' %></label>
+              <input name="image" type="file" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;">
+              <% if (isEdit && l.image && l.image.url) { %>
+                <div class="mt-2 text-muted small">Current image will be kept if you don't upload a new one.</div>
+              <% } %>
+            </div>
+            
+            <div class="col-12 col-md-6">
+              <label for="price" class="form-label fw-semibold text-muted small text-uppercase">Price per night (₹)</label>
+              <input name="listing[price]" type="number" min="0" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" value="<%= l.price || '' %>" placeholder="e.g. 1200" required>
+              <div class="invalid-feedback">Please enter a valid price.</div>
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-12 col-md-6 mb-4 mb-md-0">
+              <label for="country" class="form-label fw-semibold text-muted small text-uppercase">Country</label>
+              <input type="text" name="listing[country]" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" value="<%= l.country || '' %>" placeholder="e.g. India" required>
+              <div class="invalid-feedback">Country is required.</div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label for="location" class="form-label fw-semibold text-muted small text-uppercase">Location / City</label>
+              <input type="text" name="listing[location]" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" value="<%= l.location || '' %>" placeholder="e.g. Goa" required>
+              <div class="invalid-feedback">Location is required.</div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+              <label for="category" class="form-label fw-semibold text-muted small text-uppercase">Category</label>
+              <select name="listing[category]" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px; cursor: pointer;" required>
+                <option value="" disabled <%= !l.category ? 'selected' : '' %>>Select Category</option>
+                <option value="mountains" <%= l.category === 'mountains' ? 'selected' : '' %>>Mountains</option>
+                <option value="rooms" <%= l.category === 'rooms' ? 'selected' : '' %>>Rooms</option>
+                <option value="pools" <%= l.category === 'pools' ? 'selected' : '' %>>Pools</option>
+                <option value="beach" <%= l.category === 'beach' ? 'selected' : '' %>>Beach</option>
+                <option value="farms" <%= l.category === 'farms' ? 'selected' : '' %>>Farms</option>
+                <option value="camping" <%= l.category === 'camping' ? 'selected' : '' %>>Camping</option>
+                <option value="domes" <%= l.category === 'domes' ? 'selected' : '' %>>Domes</option>
+                <option value="iconicCities" <%= l.category === 'iconicCities' ? 'selected' : '' %>>Iconic Cities</option>
+                <option value="bedAndBreakfast" <%= l.category === 'bedAndBreakfast' ? 'selected' : '' %>>Bed & Breakfast</option>
+              </select>
+              <div class="invalid-feedback">Please select a category.</div>
+          </div>
+
+          <div class="d-grid mt-5">
+            <button type="submit" class="btn btn-danger text-white fw-bold py-2" style="border-radius: 14px; background-color: #fe424d; border: none;"><%= submitText %></button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>

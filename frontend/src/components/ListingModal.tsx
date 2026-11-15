@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { X, Check } from 'lucide-react';
 import type { Listing } from '../types/listing';
+import { ModalPortal } from './ModalPortal';
 
 interface ListingModalProps {
   isOpen: boolean;
@@ -8,6 +9,12 @@ interface ListingModalProps {
   onSubmit: (data: Partial<Listing>, imageFile?: File) => void;
   listing?: Listing | null;
   isEdit?: boolean;
+}
+
+function toOptionalNumber(value: number | string): number | undefined {
+  if (value === '') return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
 }
 
 const AVAILABLE_FACILITIES = [
@@ -34,12 +41,25 @@ export const ListingModal: React.FC<ListingModalProps> = ({
     location: listing?.location || '',
     country: listing?.country || '',
     category: listing?.category || '',
-    guests: listing?.guests || 2,
+    guests: listing?.guests ?? '',
+    bedrooms: listing?.bedrooms ?? '',
+    beds: listing?.beds ?? '',
+    bathrooms: listing?.bathrooms ?? '',
     amenities: (listing?.amenities && listing.amenities.length > 0)
       ? listing.amenities
       : ['wifi', 'ac'],
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const imagePreviewUrl = useMemo(
+    () => (imageFile ? URL.createObjectURL(imageFile) : null),
+    [imageFile]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+    };
+  }, [imagePreviewUrl]);
 
   if (!isOpen) return null;
 
@@ -66,15 +86,19 @@ export const ListingModal: React.FC<ListingModalProps> = ({
     onSubmit({
       ...formData,
       price: Number(formData.price),
-      guests: Number(formData.guests) || 2,
+      guests: toOptionalNumber(formData.guests),
+      bedrooms: toOptionalNumber(formData.bedrooms),
+      beds: toOptionalNumber(formData.beds),
+      bathrooms: toOptionalNumber(formData.bathrooms),
       amenities: formData.amenities,
     }, imageFile || undefined);
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl shadow-xl w-full max-w-xl overflow-hidden animate-in fade-in zoom-in duration-200">
+    <ModalPortal>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div className="bg-white rounded-3xl shadow-xl w-full max-w-xl max-h-[calc(100dvh-2rem)] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-2 border-b border-gray-100">
           <h2 className="text-xl font-bold text-gray-900">
@@ -89,7 +113,7 @@ export const ListingModal: React.FC<ListingModalProps> = ({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto min-h-0">
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Title</label>
             <input
@@ -167,6 +191,51 @@ export const ListingModal: React.FC<ListingModalProps> = ({
             </div>
           </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Bedrooms</label>
+              <input
+                type="number"
+                name="bedrooms"
+                min="0"
+                step="1"
+                value={formData.bedrooms}
+                onChange={handleChange}
+                placeholder="e.g. 2"
+                required
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#fe424d]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Beds</label>
+              <input
+                type="number"
+                name="beds"
+                min="1"
+                step="1"
+                value={formData.beds}
+                onChange={handleChange}
+                placeholder="e.g. 3"
+                required
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#fe424d]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Bathrooms</label>
+              <input
+                type="number"
+                name="bathrooms"
+                min="0"
+                step="0.5"
+                value={formData.bathrooms}
+                onChange={handleChange}
+                placeholder="e.g. 1.5"
+                required
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#fe424d]"
+              />
+            </div>
+          </div>
+
           {/* Dynamic Villa Facilities / Amenities Selector */}
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">
@@ -230,6 +299,17 @@ export const ListingModal: React.FC<ListingModalProps> = ({
               onChange={handleFileChange}
               className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#fe424d] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#fe424d] file:text-white hover:file:bg-[#e03a44]"
             />
+            <div className="mt-3 flex h-36 w-full items-center justify-center overflow-hidden rounded-2xl border border-gray-200 bg-gray-100">
+              {imagePreviewUrl ? (
+                <img
+                  src={imagePreviewUrl}
+                  alt="Listing preview"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="text-xs font-medium tracking-wide text-gray-400">No image added</span>
+              )}
+            </div>
           </div>
 
           <div className="pt-4">
@@ -242,6 +322,7 @@ export const ListingModal: React.FC<ListingModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+      </div>
+    </ModalPortal>
   );
 };

@@ -1,0 +1,27 @@
+# History files (e.g. VS Code Local History)
+.history/
+.history
+*.history
+
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Build directories
+dist/
+build/
+
+# IDE and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json

@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   Compass,
   Search,
@@ -16,6 +18,11 @@ import {
 } from 'lucide-react';
 import { TwoMonthCalendar } from './TwoMonthCalendar';
 import { LogoutModal } from './LogoutModal';
+import {
+  PROFILE_MENU_EDGE_MARGIN,
+  PROFILE_MENU_MIN_TOP,
+  getProfileDropdownPosition,
+} from '../utils/profileDropdown';
 
 interface NavbarProps {
   user: any;
@@ -64,6 +71,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [activeToggle, setActiveToggle] = useState<'where' | 'when' | 'who' | null>(null);
   const [isMobileExpanded, setIsMobileExpanded] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [profileMenuPosition, setProfileMenuPosition] = useState({
+    top: PROFILE_MENU_MIN_TOP,
+    right: PROFILE_MENU_EDGE_MARGIN,
+  });
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   // Guest counters (adults, children, infants)
@@ -72,7 +83,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [infants, setInfants] = useState(0);
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
-  const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const profileButtonRef = useRef<HTMLDivElement>(null);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
   const destinationInputRef = useRef<HTMLInputElement>(null);
 
   // Sync internalQuery when external search query is changed externally
@@ -97,13 +109,48 @@ export const Navbar: React.FC<NavbarProps> = ({
         setActiveToggle(null);
         setIsMobileExpanded(false);
       }
-      if (profileDropdownRef.current && !profileDropdownRef.current.contains(target)) {
+      if (
+        profileButtonRef.current &&
+        !profileButtonRef.current.contains(target) &&
+        (!profileMenuRef.current || !profileMenuRef.current.contains(target))
+      ) {
         setIsProfileDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const toggleProfileMenu = () => {
+    if (isProfileDropdownOpen) {
+      setIsProfileDropdownOpen(false);
+      return;
+    }
+
+    const trigger = profileButtonRef.current;
+    if (trigger) {
+      setProfileMenuPosition(
+        getProfileDropdownPosition(trigger.getBoundingClientRect(), window.innerWidth),
+      );
+    }
+    setIsProfileDropdownOpen(true);
+  };
+
+  useEffect(() => {
+    if (!isProfileDropdownOpen) return;
+
+    const handleResize = () => {
+      const trigger = profileButtonRef.current;
+      if (!trigger) return;
+
+      setProfileMenuPosition(
+        getProfileDropdownPosition(trigger.getBoundingClientRect(), window.innerWidth),
+      );
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isProfileDropdownOpen]);
 
   const totalGuests = adults + children;
 
@@ -172,23 +219,23 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white border-b border-gray-200">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 xl:px-14 2xl:px-16 h-20 flex items-center justify-between gap-2 sm:gap-4">
+      <header className="sticky top-0 z-40 border-b border-black/5 bg-white/90 shadow-[0_1px_2px_rgba(28,25,23,0.04)] backdrop-blur-md">
+        <div className="mx-auto flex h-20 max-w-[1920px] items-center justify-between gap-2 px-3 sm:gap-3 sm:px-6 lg:gap-4 lg:px-12 xl:px-14 2xl:px-16">
 
           {/* Logo & Explore */}
-          <div className="flex items-center gap-3 shrink-0">
-            <a href="/" className="flex items-center gap-2 text-[#fe424d] font-bold text-xl hover:opacity-90 transition">
-              <Compass className="w-8 h-8" />
-              <span className="hidden lg:inline tracking-tight font-bold text-[22px]">Stay-Go</span>
+          <div className="flex shrink-0 items-center gap-3">
+            <a href="/" className="flex items-center gap-2 text-xl font-bold text-[#fe424d] transition hover:opacity-90">
+              <Compass className="h-8 w-8" />
+              <span className="hidden font-bold tracking-tight lg:inline text-[22px]">Stay-Go</span>
             </a>
           </div>
 
           {/* Interactive Multi-Toggle Search Bar (Where | When | Who) */}
-          <div className="flex-1 max-w-2xl mx-1 sm:mx-3 relative" ref={searchContainerRef}>
+          <div className="relative mx-0 min-w-0 max-w-2xl flex-1 sm:mx-2 lg:mx-3" ref={searchContainerRef}>
 
             {/* Desktop / Tablet: 3-Segment Interactive Pill Bar */}
             <div
-              className={`hidden md:flex items-center h-14 rounded-full border transition-all duration-200 ${activeToggle
+              className={`hidden md:flex w-full min-w-0 items-center h-14 rounded-full border transition-all duration-200 ${activeToggle
                 ? 'bg-gray-100/90 border-gray-300 shadow-sm'
                 : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
                 }`}
@@ -199,7 +246,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setActiveToggle('where');
                   setTimeout(() => destinationInputRef.current?.focus(), 50);
                 }}
-                className={`flex-1 min-w-[150px] lg:min-w-[190px] h-full px-5 rounded-full cursor-pointer transition-all duration-150 flex flex-col justify-center select-none ${activeToggle === 'where'
+                className={`flex h-full min-w-0 flex-1 basis-0 flex-col justify-center rounded-full px-4 cursor-pointer select-none transition-all duration-150 lg:px-5 ${activeToggle === 'where'
                   ? 'bg-white shadow-sm'
                   : 'hover:bg-gray-100/60'
                   }`}
@@ -207,7 +254,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="text-[12px] font-medium text-gray-800">
                   Where
                 </span>
-                <div className="flex items-center justify-between">
+                <div className="flex min-w-0 items-center justify-between">
                   <input
                     ref={destinationInputRef}
                     type="text"
@@ -220,7 +267,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       }
                     }}
                     placeholder="Search destinations"
-                    className="w-full bg-transparent text-[13px] sm:text-sm font-normal text-gray-800 placeholder:text-gray-500 placeholder:font-normal border-0 border-none outline-none focus:outline-none focus:ring-0 focus:border-none focus-visible:outline-none focus-visible:ring-0 shadow-none focus:shadow-none truncate"
+                    className="w-full min-w-0 bg-transparent text-[13px] sm:text-sm font-normal text-gray-800 placeholder:text-gray-500 placeholder:font-normal border-0 border-none outline-none focus:outline-none focus:ring-0 focus:border-none focus-visible:outline-none focus-visible:ring-0 shadow-none focus:shadow-none truncate"
                     style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
                   />
                   {internalQuery && (
@@ -248,7 +295,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               {/* Toggle 2: WHEN */}
               <div
                 onClick={() => setActiveToggle(activeToggle === 'when' ? null : 'when')}
-                className={`flex-1 min-w-[130px] lg:min-w-[160px] h-full px-5 rounded-full cursor-pointer transition-all duration-150 flex flex-col justify-center select-none ${activeToggle === 'when'
+                className={`flex h-full min-w-0 flex-1 basis-0 flex-col justify-center rounded-full px-4 cursor-pointer select-none transition-all duration-150 lg:px-5 ${activeToggle === 'when'
                   ? 'bg-white shadow-sm'
                   : 'hover:bg-gray-100/60'
                   }`}
@@ -256,9 +303,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="text-[12px] font-medium text-gray-800">
                   When
                 </span>
-                <div className="flex items-center justify-between">
+                <div className="flex min-w-0 items-center justify-between">
                   <span
-                    className={`text-[13px] sm:text-sm truncate ${checkIn && checkOut
+                    className={`min-w-0 truncate text-[13px] sm:text-sm ${checkIn && checkOut
                       ? 'font-medium text-gray-800'
                       : 'text-gray-500 font-normal'
                       }`}
@@ -293,7 +340,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               {/* Toggle 3: WHO */}
               <div
                 onClick={() => setActiveToggle(activeToggle === 'who' ? null : 'who')}
-                className={`flex-1 min-w-[140px] lg:min-w-[180px] h-full pl-5 pr-2 rounded-full cursor-pointer transition-all duration-150 flex items-center justify-between gap-1 select-none ${activeToggle === 'who'
+                className={`flex h-full min-w-0 flex-1 basis-0 items-center justify-between gap-1 rounded-full pl-4 pr-1.5 cursor-pointer select-none transition-all duration-150 lg:pl-5 lg:pr-2 ${activeToggle === 'who'
                   ? 'bg-white shadow-sm'
                   : 'hover:bg-gray-100/60'
                   }`}
@@ -348,7 +395,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="md:hidden">
               <button
                 type="button"
-                onClick={() => setIsMobileExpanded(!isMobileExpanded)}
+                onClick={() => {
+                  setIsMobileExpanded((prev) => !prev);
+                  setActiveToggle(null);
+                }}
                 className="w-full flex items-center gap-3 px-3.5 py-2.5 bg-white border border-gray-300 rounded-full shadow-xs text-left"
               >
                 <Search className="w-4 h-4 text-[#fe424d] shrink-0" />
@@ -366,8 +416,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
 
               {/* Mobile Expanded Drawer */}
-              {isMobileExpanded && (
-                <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-3xl shadow-2xl border border-gray-200 p-4 z-50 animate-in fade-in zoom-in-95 duration-150">
+              <AnimatePresence>
+                {isMobileExpanded && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                    transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                    className="fixed inset-x-3 top-[84px] z-50 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-3xl border border-gray-200 bg-white p-4 shadow-2xl sm:inset-x-4"
+                  >
                   <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-3">
                     <span className="text-sm font-bold text-gray-900">Plan your trip</span>
                     <button
@@ -397,7 +454,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <div className="grid grid-cols-2 gap-2 mb-4">
                     <button
                       type="button"
-                      onClick={() => setActiveToggle('when')}
+                      onClick={() => {
+                        setIsMobileExpanded(false);
+                        setActiveToggle('when');
+                      }}
                       className={`p-2.5 rounded-xl border text-left transition ${activeToggle === 'when'
                         ? 'border-gray-400 bg-gray-50'
                         : 'border-gray-200 bg-gray-50/50'
@@ -411,7 +471,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                     <button
                       type="button"
-                      onClick={() => setActiveToggle('who')}
+                      onClick={() => {
+                        setIsMobileExpanded(false);
+                        setActiveToggle('who');
+                      }}
                       className={`p-2.5 rounded-xl border text-left transition ${activeToggle === 'who'
                         ? 'border-gray-400 bg-gray-50'
                         : 'border-gray-200 bg-gray-50/50'
@@ -433,13 +496,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <Search className="w-4 h-4" />
                     <span>Search</span>
                   </button>
-                </div>
-              )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* POPOVER 1: WHERE - Popular Destinations */}
-            {activeToggle === 'where' && (
-              <div className="absolute left-0 top-full mt-3 bg-white rounded-3xl shadow-2xl border border-gray-200 p-5 sm:p-6 z-50 w-full sm:w-[420px] max-w-[95vw] animate-in fade-in zoom-in-95 duration-150">
+            <AnimatePresence>
+              {activeToggle === 'where' && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                  transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                  className="fixed inset-x-3 top-[84px] z-50 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-3xl border border-gray-200 bg-white p-5 shadow-2xl sm:inset-x-4 md:absolute md:inset-x-auto md:left-0 md:top-full md:mt-3 md:w-[420px] md:p-6"
+                >
                 <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-[#fe424d]" />
@@ -481,16 +552,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </button>
                   ))}
                 </div>
-              </div>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* POPOVER 2: WHEN - Two-Month Calendar */}
-            {activeToggle === 'when' && (
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2.5 bg-white rounded-3xl shadow-xl border border-gray-200 p-4 sm:p-5 z-50 min-w-[300px] sm:min-w-[530px] max-w-[95vw] animate-in fade-in zoom-in-95 duration-150">
-                <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-gray-100">
-                  <div className="flex items-center gap-2">
-                    <CalendarIcon className="w-4 h-4 text-[#fe424d]" />
-                    <span className="text-xs sm:text-sm font-bold text-gray-900">
+            <AnimatePresence>
+              {activeToggle === 'when' && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                  transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                  className="fixed inset-x-3 top-[84px] z-50 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-3xl border border-gray-200 bg-white p-3 shadow-xl sm:inset-x-4 sm:p-4 md:absolute md:inset-x-auto md:left-1/2 md:top-full md:mt-2.5 md:w-auto md:min-w-[530px] md:max-w-[95vw] md:-translate-x-1/2 md:p-5"
+                >
+                <div className="flex items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-gray-100">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <CalendarIcon className="w-4 h-4 shrink-0 text-[#fe424d]" />
+                    <span className="truncate text-xs sm:text-sm font-bold text-gray-900">
                       {internalQuery ? `Select dates for "${internalQuery}"` : 'Select travel dates'}
                     </span>
                   </div>
@@ -514,18 +593,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                 />
 
                 {/* Popover Footer */}
-                <div className="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between">
+                <div className="mt-3 flex flex-col gap-2 border-t border-gray-100 pt-2.5 sm:flex-row sm:items-center sm:justify-between">
                   <button
                     type="button"
                     onClick={() => {
                       if (onDatesChange) onDatesChange('', '');
                     }}
-                    className="text-xs font-semibold text-gray-500 hover:text-gray-900 underline cursor-pointer"
+                    className="self-start text-xs font-semibold text-gray-500 hover:text-gray-900 underline cursor-pointer"
                   >
                     Clear dates
                   </button>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
                     <button
                       type="button"
                       onClick={() => setActiveToggle('who')}
@@ -536,19 +615,27 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <button
                       type="button"
                       onClick={executeSearch}
-                      className="flex items-center gap-2 bg-[#fe424d] hover:bg-[#e03a45] text-white px-5 py-2.5 rounded-full text-xs font-bold transition shadow-sm hover:shadow-md cursor-pointer active:scale-95"
+                      className="flex items-center gap-2 bg-[#fe424d] hover:bg-[#e03a45] text-white px-4 py-2.5 rounded-full text-xs font-bold transition shadow-sm hover:shadow-md cursor-pointer active:scale-95 sm:px-5"
                     >
                       <Search className="w-3.5 h-3.5" />
                       <span>Search Stays</span>
                     </button>
                   </div>
                 </div>
-              </div>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* POPOVER 3: WHO - Interactive Guest Counters */}
-            {activeToggle === 'who' && (
-              <div className="absolute right-0 top-full mt-3 bg-white rounded-3xl shadow-2xl border border-gray-200 p-5 sm:p-6 z-50 w-full sm:w-[380px] max-w-[95vw] animate-in fade-in zoom-in-95 duration-150">
+            <AnimatePresence>
+              {activeToggle === 'who' && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                  transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                  className="fixed inset-x-3 top-[84px] z-50 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-3xl border border-gray-200 bg-white p-5 shadow-2xl sm:inset-x-4 md:absolute md:inset-x-auto md:right-0 md:top-full md:mt-3 md:w-[380px] md:p-6"
+                >
                 <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-[#fe424d]" />
@@ -681,8 +768,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <span>Apply & Search</span>
                   </button>
                 </div>
-              </div>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
           </div>
 
@@ -699,10 +787,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               /* When logged in: Interactive User Profile Avatar with dropdown + separate logout icon */
               <div className="flex items-center gap-2 shrink-0">
                 {/* Interactive Profile Icon & Dropdown Container */}
-                <div className="relative flex items-center" ref={profileDropdownRef}>
+                <div className="relative flex items-center" ref={profileButtonRef}>
                   <button
                     type="button"
-                    onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
+                    onClick={toggleProfileMenu}
                     aria-expanded={isProfileDropdownOpen}
                     aria-haspopup="true"
                     title={`Account menu for ${username || email}`}
@@ -716,12 +804,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </button>
 
                   {/* Profile Dropdown Menu */}
-                  {isProfileDropdownOpen && (
-                    <div
-                      className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-xl border border-gray-200 py-2.5 z-50 animate-in fade-in zoom-in-95 duration-150 overflow-hidden"
-                      role="menu"
-                      aria-orientation="vertical"
-                    >
+                  {typeof document !== 'undefined' &&
+                    createPortal(
+                      <AnimatePresence>
+                        {isProfileDropdownOpen && (
+                          <motion.div
+                            ref={profileMenuRef}
+                            style={profileMenuPosition}
+                            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                            className="fixed z-50 w-72 origin-top-right overflow-hidden rounded-2xl border border-gray-200 bg-white py-2.5 shadow-xl sm:w-80 max-w-[calc(100vw-1.5rem)]"
+                            role="menu"
+                            aria-orientation="vertical"
+                          >
                       {/* User Profile Card Header */}
                       <div className="px-4 py-2.5 border-b border-gray-100 bg-gray-50/60">
                         <div className="flex items-center gap-3">
@@ -832,8 +929,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                           <span>Log out</span>
                         </button>
                       </div>
-                    </div>
-                  )}
+                      </motion.div>
+                        )}
+                      </AnimatePresence>,
+                      document.body,
+                    )}
                 </div>
 
                 {/* Separate Rounded-Full Logout Icon Button (opens confirmation modal) */}
@@ -873,17 +973,21 @@ export const Navbar: React.FC<NavbarProps> = ({
       />
 
       {/* Floating Action Button (FAB) - Hidden cleanly when modal is open */}
-      {!isModalOpen && (
-        <div className="fixed bottom-8 right-6 z-50 md:hidden">
-          <button
-            onClick={onOpenCreateModal}
-            aria-label="Create Listing"
-            className="w-12 h-12 rounded-full bg-[#fe424d] text-white shadow-lg flex items-center justify-center hover:bg-[#e03a44] transition-all transform active:scale-95"
+      {!isModalOpen && !isLogoutModalOpen && typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            className="fixed bottom-8 right-6 z-50 md:hidden"
           >
-            <Plus className="w-6 h-6" />
-          </button>
-        </div>
-      )}
+            <button
+              onClick={onOpenCreateModal}
+              aria-label="Create Listing"
+              className="w-12 h-12 rounded-full bg-[#fe424d] text-white shadow-lg flex items-center justify-center hover:bg-[#e03a44] transition-all transform active:scale-95"
+            >
+              <Plus className="w-6 h-6" />
+            </button>
+          </div>,
+          document.body,
+        )}
     </>
   );
 };

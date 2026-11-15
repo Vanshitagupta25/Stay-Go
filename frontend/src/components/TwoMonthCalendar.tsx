@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { formatStandardDate } from '../utils/dateFormatter';
+import { isNightBooked, isRangeBooked } from '../utils/availability';
 
 interface TwoMonthCalendarProps {
   checkIn: string;
   checkOut: string;
   onDatesChange: (checkIn: string, checkOut: string) => void;
+  bookedDates?: string[];
   locationName?: string;
   compact?: boolean;
 }
@@ -14,6 +16,7 @@ export const TwoMonthCalendar: React.FC<TwoMonthCalendarProps> = ({
   checkIn,
   checkOut,
   onDatesChange,
+  bookedDates = [],
   locationName,
   compact = false,
 }) => {
@@ -56,7 +59,7 @@ export const TwoMonthCalendar: React.FC<TwoMonthCalendarProps> = ({
   };
 
   const handleDateClick = (dateStr: string) => {
-    if (dateStr < todayStr) return;
+    if (dateStr < todayStr || isNightBooked(dateStr, bookedDates)) return;
 
     if (!checkIn || (checkIn && checkOut)) {
       // Start a new selection
@@ -68,8 +71,8 @@ export const TwoMonthCalendar: React.FC<TwoMonthCalendarProps> = ({
       } else if (dateStr === checkIn) {
         // Deselect
         onDatesChange('', '');
-      } else {
-        // Complete range
+      } else if (!isRangeBooked(checkIn, dateStr, bookedDates)) {
+        // Complete range only when it does not cross a booked night
         onDatesChange(checkIn, dateStr);
       }
     }
@@ -160,6 +163,8 @@ export const TwoMonthCalendar: React.FC<TwoMonthCalendarProps> = ({
           {dayNumbers.map((day) => {
             const dateStr = `${year}-${padZero(month + 1)}-${padZero(day)}`;
             const isPast = dateStr < todayStr;
+            const isBooked = isNightBooked(dateStr, bookedDates);
+            const isDisabled = isPast || isBooked;
             const isCheckIn = dateStr === checkIn;
             const isCheckOut = dateStr === checkOut;
 
@@ -192,14 +197,21 @@ export const TwoMonthCalendar: React.FC<TwoMonthCalendarProps> = ({
                 <button
                   type="button"
                   onClick={() => handleDateClick(dateStr)}
-                  onMouseEnter={() => !isPast && setHoveredDate(dateStr)}
+                  onMouseEnter={() => !isDisabled && setHoveredDate(dateStr)}
                   onMouseLeave={() => setHoveredDate(null)}
-                  disabled={isPast}
+                  disabled={isDisabled}
+                  aria-label={
+                    isBooked
+                      ? `${dateStr} is already booked`
+                      : `${dateStr} is available`
+                  }
                   className={`relative z-10 ${
                     compact ? 'w-7.5 h-7.5 text-xs' : 'w-9 h-9 text-sm'
                   } rounded-full flex items-center justify-center font-medium transition ${
                     isPast
                       ? 'text-gray-300 line-through cursor-not-allowed'
+                      : isBooked
+                      ? 'bg-rose-50/60 text-gray-300 line-through cursor-not-allowed'
                       : isCheckIn || isCheckOut
                       ? 'bg-gray-900 text-white font-semibold shadow-2xs'
                       : isInRange
@@ -218,7 +230,7 @@ export const TwoMonthCalendar: React.FC<TwoMonthCalendarProps> = ({
   };
 
   return (
-    <div className={compact ? 'w-full' : 'pb-8 border-b border-gray-200'}>
+    <div className={compact ? 'w-full' : 'pb-8'}>
       {/* Calendar Header with Title & Clear Dates button */}
       {!compact && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
@@ -255,7 +267,7 @@ export const TwoMonthCalendar: React.FC<TwoMonthCalendarProps> = ({
       )}
 
       {/* Two Month Calendars Side-by-Side */}
-      <div className={`flex flex-col sm:flex-row ${compact ? 'gap-4 sm:gap-6' : 'gap-8 lg:gap-12 bg-white rounded-2xl p-4 sm:p-6 border border-gray-100 shadow-xs'}`}>
+      <div className={`flex flex-col sm:flex-row ${compact ? 'gap-4 sm:gap-6' : 'gap-8 rounded-3xl border border-gray-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(28,25,23,0.04),0_18px_44px_-36px_rgba(28,25,23,0.35)] sm:p-6 lg:gap-12'}`}>
         {renderMonth(currentMonthDate, true)}
         {renderMonth(nextMonthDate, false)}
       </div>

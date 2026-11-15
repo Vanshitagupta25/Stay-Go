@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { X, Heart, Star, Compass, Loader2 } from 'lucide-react';
 import { authService } from '../services';
 import type { Listing } from '../types/listing';
+import { ModalPortal } from './ModalPortal';
 
 export interface WishlistModalProps {
   isOpen: boolean;
@@ -82,15 +83,16 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="wishlist-modal-title"
-    >
+    <ModalPortal>
+      <div
+        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="wishlist-modal-title"
+      >
       <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 fade-in duration-200">
         
         {/* Modal Header */}
@@ -172,14 +174,17 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({
                   className="group cursor-pointer rounded-2xl border border-gray-150 overflow-hidden hover:shadow-md transition-all duration-200 bg-white flex flex-col"
                 >
                   <div className="relative aspect-[16/11] bg-gray-100 overflow-hidden">
-                    <img
-                      src={
-                        item.image?.url ||
-                        'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80'
-                      }
-                      alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                    {item.image?.url ? (
+                      <img
+                        src={item.image.url}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-xs font-medium text-gray-400">
+                        No image added
+                      </div>
+                    )}
                     <button
                       type="button"
                       onClick={(e) => handleRemove(e, item._id)}
@@ -228,6 +233,7 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({
         </div>
 
       </div>
-    </div>
+      </div>
+    </ModalPortal>
   );
 };

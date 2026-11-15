@@ -17,10 +17,29 @@ export interface GetListingsResponse {
   hasPrevPage?: boolean;
 }
 
+export interface BookedRange {
+  checkIn: string;
+  checkOut: string;
+}
+
+export interface ListingAvailabilityResponse {
+  success: boolean;
+  available?: boolean;
+  bookedRanges: BookedRange[];
+  bookedDates: string[];
+  message?: string;
+}
+
+export interface ListingAvailabilityRequest {
+  listingId: string;
+  checkIn?: string;
+  checkOut?: string;
+}
+
 export const listingApi = createApi({
   reducerPath: "listingApi",
   baseQuery: axiosBaseQuery(),
-  tagTypes: ["Listings", "Listing"],
+  tagTypes: ["Listings", "Listing", "Availability"],
   endpoints: (builder) => ({
     getListings: builder.query<
       GetListingsResponse,
@@ -48,6 +67,22 @@ export const listingApi = createApi({
         method: "GET",
       }),
       providesTags: (_result, _error, id) => [{ type: "Listing", id }],
+    }),
+    getListingAvailability: builder.query<
+      ListingAvailabilityResponse,
+      ListingAvailabilityRequest
+    >({
+      query: ({ listingId, checkIn, checkOut }) => ({
+        url: API_ENDPOINTS.LISTINGS.AVAILABILITY(listingId),
+        method: "GET",
+        params: {
+          ...(checkIn ? { checkIn } : {}),
+          ...(checkOut ? { checkOut } : {}),
+        },
+      }),
+      providesTags: (_result, _error, { listingId }) => [
+        { type: "Availability", id: listingId },
+      ],
     }),
     addReview: builder.mutation<
       any,
@@ -84,6 +119,7 @@ export const listingApi = createApi({
 export const {
   useGetListingsQuery,
   useGetListingByIdQuery,
+  useGetListingAvailabilityQuery,
   useAddReviewMutation,
   useDeleteReviewMutation,
 } = listingApi;

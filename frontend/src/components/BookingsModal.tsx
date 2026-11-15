@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { X, CalendarCheck, Compass, Loader2, ArrowRight, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { paymentService } from '../services';
+import { ModalPortal } from './ModalPortal';
 
 export interface BookingsModalProps {
   isOpen: boolean;
@@ -85,15 +86,16 @@ export const BookingsModal: React.FC<BookingsModalProps> = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="bookings-modal-title"
-    >
+    <ModalPortal>
+      <div
+        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="bookings-modal-title"
+      >
       <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 fade-in duration-200">
         
         {/* Modal Header */}
@@ -180,14 +182,17 @@ export const BookingsModal: React.FC<BookingsModalProps> = ({
                     <div className="flex items-center gap-4 min-w-0 flex-1">
                       {/* Listing Image */}
                       <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-gray-100 shrink-0 border border-gray-100">
-                        <img
-                          src={
-                            listing.image?.url ||
-                            'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80'
-                          }
-                          alt={listing.title || 'Stay'}
-                          className="w-full h-full object-cover"
-                        />
+                        {listing.image?.url ? (
+                          <img
+                            src={listing.image.url}
+                            alt={listing.title || 'Stay'}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center px-1 text-center text-[10px] font-medium text-gray-400">
+                            No image
+                          </div>
+                        )}
                       </div>
 
                       {/* Booking Details */}
@@ -271,6 +276,7 @@ export const BookingsModal: React.FC<BookingsModalProps> = ({
         </div>
 
       </div>
-    </div>
+      </div>
+    </ModalPortal>
   );
 };

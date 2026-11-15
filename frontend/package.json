@@ -7,12 +7,14 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
+    "test": "node --test \"src/tests/*.test.ts\" \"src/tests/*.test.cjs\"",
     "preview": "vite preview"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.13.0",
     "@tailwindcss/vite": "^4.3.3",
     "axios": "^1.20.0",
+    "framer-motion": "^14.14.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.49.0",
     "react": "^19.2.8",

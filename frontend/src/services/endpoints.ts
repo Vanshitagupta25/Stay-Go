@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
   LISTINGS: {
     BASE: '/listings',
     BY_ID: (id: string) => `/listings/${id}`,
+    AVAILABILITY: (id: string) => `/listings/${id}/availability`,
   },
   REVIEWS: {
     BASE: (listingId: string) => `/listings/${listingId}/reviews`,
@@ -20,6 +21,7 @@ export const API_ENDPOINTS = {
   PAYMENT: {
     CREATE_ORDER: '/payment/create-order',
     VERIFY_SIGNATURE: '/payment/verify-signature',
+    CANCEL_ORDER: '/payment/cancel-order',
     MY_BOOKINGS: '/payment/my-bookings',
   },
   WISHLIST: {

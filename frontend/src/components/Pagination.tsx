@@ -85,7 +85,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   return (
     <nav
       aria-label="Pagination Navigation"
-      className={`mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200 pt-6 ${className}`}
+      className={`mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-200/80 pt-6 sm:flex-row ${className}`}
     >
       {/* Items count summary */}
       {showInfo && totalItems !== undefined && (
@@ -105,7 +105,7 @@ export const Pagination: React.FC<PaginationProps> = ({
       )}
 
       {/* Pagination Controls */}
-      <div className="inline-flex items-center gap-1.5 bg-white border border-gray-200 rounded-2xl p-1.5 shadow-xs">
+      <div className="inline-flex items-center gap-1.5 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-sm">
         {/* Previous Page Button */}
         <button
           type="button"

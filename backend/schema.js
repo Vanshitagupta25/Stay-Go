@@ -3,12 +3,18 @@ const Joi  = require("joi");
 module.exports.ListingSchema = Joi.object({
   listing : Joi.object({
     title : Joi.string().required(),
-    description : Joi.string().required(),
+    description : Joi.string().allow("", null),
     location : Joi.string().required(),
     country : Joi.string().required(),
     price : Joi.number().required().min(0),
-    image : Joi.string().allow("" , null)
-  }).required()
+    image : Joi.string().allow("" , null),
+    category : Joi.string().allow("" , null),
+    guests : Joi.number().integer().min(1).allow(null),
+    bedrooms : Joi.number().integer().min(0).allow(null),
+    beds : Joi.number().integer().min(1).allow(null),
+    bathrooms : Joi.number().min(0).multiple(0.5).allow(null),
+    amenities : Joi.array().items(Joi.string()).allow(null),
+  }).unknown(true).required()
 });
 
 module.exports.reviewSchema = Joi.object({

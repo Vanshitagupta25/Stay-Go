@@ -7,8 +7,18 @@ const userSchema = new Schema({
   email: {
     type: String,
     required: true,
-  }
-});
+  },
+  wishlist: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Listing",
+    },
+  ],
+  lastActive: {
+    type: Date,
+    default: Date.now,
+  },
+}, { timestamps: true });
 
 userSchema.plugin(passportLocalMongoose);
 

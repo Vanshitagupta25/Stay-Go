@@ -1,6 +1,7 @@
 import { apiClient } from './apiClient';
 import { API_ENDPOINTS } from './endpoints';
 import type { Listing } from '../types/listing';
+import { buildListingFormData } from '../utils/listingPayload';
 
 export interface ListingFilterParams {
   category?: string;
@@ -33,6 +34,11 @@ export interface CreateListingInput {
   location?: string;
   country?: string;
   category?: string;
+  guests?: number;
+  bedrooms?: number;
+  beds?: number;
+  bathrooms?: number;
+  amenities?: string[];
 }
 
 /**
@@ -66,16 +72,7 @@ export const listingService = {
     input: CreateListingInput,
     imageFile?: File | null
   ): Promise<{ success: boolean; message?: string; listing?: any }> {
-    const formData = new FormData();
-    formData.append('listing[title]', input.title || '');
-    formData.append('listing[description]', input.description || '');
-    formData.append('listing[price]', String(input.price || 0));
-    formData.append('listing[location]', input.location || '');
-    formData.append('listing[country]', input.country || '');
-    formData.append('listing[category]', input.category || '');
-    if (imageFile) {
-      formData.append('image', imageFile);
-    }
+    const formData = buildListingFormData(input, imageFile);
 
     const response = await apiClient.post(API_ENDPOINTS.LISTINGS.BASE, formData, {
       headers: {

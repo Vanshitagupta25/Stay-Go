@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 export interface Category {
   id: string;
@@ -29,21 +30,37 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
   onSelectCategory,
 }) => {
   return (
-    <div className="flex items-center gap-6 overflow-x-auto py-4 px-2 scrollbar-none border-b border-gray-200 mb-6">
+    <div className="scrollbar-none mb-6 flex items-center gap-1.5 overflow-x-auto border-b border-gray-200/80 px-1 pb-3 pt-1">
       {CATEGORIES.map((cat) => {
         const isActive = selectedCategory === cat.id;
         return (
           <button
             key={cat.id}
             onClick={() => onSelectCategory(isActive ? "" : cat.id)}
-            className={`flex flex-col items-center min-w-[65px] transition-all cursor-pointer border-b-2 pb-2 ${
+            aria-pressed={isActive}
+            className={`group relative flex min-w-[74px] cursor-pointer flex-col items-center gap-1.5 rounded-2xl px-3 py-2.5 transition-colors duration-200 ${
               isActive
-                ? "border-rose-500 text-rose-500 font-semibold opacity-100"
-                : "border-transparent text-gray-500 hover:text-gray-900 opacity-70 hover:opacity-100"
+                ? "text-[#fe424d]"
+                : "text-gray-500 hover:bg-gray-50/80 hover:text-gray-900"
             }`}
           >
-            <span className="text-xl mb-1">{cat.icon}</span>
-            <span className="text-xs whitespace-nowrap">{cat.label}</span>
+            {isActive && (
+              <motion.span
+                layoutId="category-active-pill"
+                className="absolute inset-0 rounded-2xl bg-rose-50 ring-1 ring-rose-100"
+                transition={{ type: "spring", stiffness: 380, damping: 32 }}
+              />
+            )}
+            <span className="relative z-10 text-xl transition-transform duration-200 group-hover:-translate-y-0.5">
+              {cat.icon}
+            </span>
+            <span
+              className={`relative z-10 whitespace-nowrap text-xs ${
+                isActive ? "font-semibold" : "font-medium"
+              }`}
+            >
+              {cat.label}
+            </span>
           </button>
         );
       })}

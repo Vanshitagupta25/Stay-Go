@@ -231,14 +231,17 @@ export const CitySplitMap: React.FC<CitySplitMapProps> = ({
                   className="w-52 cursor-pointer group text-left p-1"
                 >
                   <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 mb-2">
-                    <img
-                      src={
-                        item.image?.url ||
-                        'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80'
-                      }
-                      alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                    />
+                    {item.image?.url ? (
+                      <img
+                        src={item.image.url}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-[10px] font-medium text-gray-400">
+                        No image
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center justify-between gap-1">
                     <h4 className="font-bold text-gray-900 text-xs truncate">
