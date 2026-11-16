@@ -45,10 +45,10 @@ export const WELCOME_DESTINATIONS: WelcomeDestination[] = [
 
 export const WELCOME_TIMINGS = {
   logo: 0,
-  title: 1000,
-  tagline: 2000,
-  destinations: 3000,
-  cta: 4000,
+  title: 250,
+  tagline: 1100,
+  destinations: 2000,
+  cta: 2400,
 } as const;
 
 export const WELCOME_ROTATION_MS = 5200;

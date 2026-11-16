@@ -44,6 +44,40 @@ export function App() {
   const [user, setUser] = useState<any>(null);
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [hoveredListingId, setHoveredListingId] = useState<string | null>(null);
+
+  const setListingInUrl = (listingId: string | null) => {
+    const url = new URL(window.location.href);
+    if (listingId) {
+      url.searchParams.set('listing', listingId);
+    } else {
+      url.searchParams.delete('listing');
+    }
+    window.history.pushState({}, '', url.toString());
+  };
+
+  const openListing = (listing: Listing) => {
+    setSelectedListing(listing);
+    setListingInUrl(listing._id);
+  };
+
+  const closeListing = () => {
+    setSelectedListing(null);
+    setListingInUrl(null);
+  };
+
+  useEffect(() => {
+    const syncFromUrl = () => {
+      const id = new URLSearchParams(window.location.search).get('listing');
+      if (id) {
+        setSelectedListing((prev) => (prev?._id === id ? prev : ({ _id: id } as Listing)));
+      } else {
+        setSelectedListing(null);
+      }
+    };
+    syncFromUrl();
+    window.addEventListener('popstate', syncFromUrl);
+    return () => window.removeEventListener('popstate', syncFromUrl);
+  }, []);
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [wishlistToast, setWishlistToast] = useState<{ message: string; visible: boolean } | null>(null);
   const [isSortOpen, setIsSortOpen] = useState(false);
@@ -485,7 +519,7 @@ export function App() {
                         compact
                         isFavorite={Boolean(favorites[listing._id])}
                         isHighlighted={hoveredListingId === listing._id}
-                        onOpen={() => setSelectedListing(listing)}
+                        onOpen={() => openListing(listing)}
                         onToggleFavorite={(e) => toggleFavorite(listing._id, e)}
                         onHoverChange={setHoveredListingId}
                       />
@@ -513,7 +547,7 @@ export function App() {
                   listings={listings}
                   searchCity={searchCity}
                   hoveredListingId={hoveredListingId}
-                  onSelectListing={(listing) => setSelectedListing(listing)}
+                  onSelectListing={(listing) => openListing(listing)}
                 />
               </div>
             </div>
@@ -526,7 +560,7 @@ export function App() {
                     listing={listing}
                     index={index}
                     isFavorite={Boolean(favorites[listing._id])}
-                    onOpen={() => setSelectedListing(listing)}
+                    onOpen={() => openListing(listing)}
                     onToggleFavorite={(e) => toggleFavorite(listing._id, e)}
                   />
                 ))}
@@ -572,7 +606,7 @@ export function App() {
             isFavorite={Boolean(favorites[selectedListing._id])}
             onToggleFavorite={(e) => toggleFavorite(selectedListing._id, e)}
             onOpenAuthModal={(mode) => setAuthModalState({ isOpen: true, mode })}
-            onClose={() => setSelectedListing(null)}
+            onClose={closeListing}
           />
         </div>
       )}
@@ -616,7 +650,7 @@ export function App() {
       <WishlistModal
         isOpen={isWishlistModalOpen}
         onClose={() => setIsWishlistModalOpen(false)}
-        onSelectListing={(listing) => setSelectedListing(listing)}
+        onSelectListing={(listing) => openListing(listing)}
         onRemoveFavorite={(listingId) => {
           toggleFavorite(listingId, { stopPropagation: () => {} } as any);
         }}
@@ -626,7 +660,7 @@ export function App() {
       <BookingsModal
         isOpen={isBookingsModalOpen}
         onClose={() => setIsBookingsModalOpen(false)}
-        onSelectListing={(listing) => setSelectedListing(listing)}
+        onSelectListing={(listing) => openListing(listing)}
       />
     </div>
   );

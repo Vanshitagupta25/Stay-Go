@@ -116,7 +116,7 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({
       <div className="absolute inset-x-0 bottom-24 z-20 flex justify-center px-6 sm:justify-start sm:px-8 lg:px-12">
         <div
           className="welcome-destination-chip inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-black/25 px-4 py-2 text-xs font-medium text-white/80 backdrop-blur-md sm:text-sm"
-          style={{ animationDelay: `${WELCOME_TIMINGS.destinations + 400}ms` }}
+          style={{ animationDelay: `${WELCOME_TIMINGS.destinations + 300}ms` }}
         >
           <MapPin className="h-4 w-4 text-[#fe424d]" />
           <span className="font-semibold text-white">{activeDestination.name}</span>

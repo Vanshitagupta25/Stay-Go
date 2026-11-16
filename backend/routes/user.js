@@ -24,7 +24,7 @@ router.route("/login")
       }
       req.login(user, (err) => {
         if (err) return next(err);
-        return userController.userLogin(req, res);
+        return userController.userLogin(req, res, next);
       });
     })(req, res, next);
   });
@@ -40,6 +40,9 @@ router.get("/curr-user", wrapAsync(async (req, res) => {
     if (user) {
       user.lastActive = new Date();
       await user.save();
+      user = user.toObject();
+      delete user.hash;
+      delete user.salt;
     }
   }
   return sendResponse(req, res, {
@@ -51,8 +54,8 @@ router.get("/curr-user", wrapAsync(async (req, res) => {
 const { getUserBookings } = require("../controllers/payment.js");
 const { isLoggedIn } = require("../middleware.js");
 
-router.post("/wishlist/:listingId", wrapAsync(userController.toggleWishlist));
-router.get("/wishlist", wrapAsync(userController.getWishlist));
+router.post("/wishlist/:listingId", isLoggedIn, wrapAsync(userController.toggleWishlist));
+router.get("/wishlist", isLoggedIn, wrapAsync(userController.getWishlist));
 router.get("/my-bookings", isLoggedIn, wrapAsync(getUserBookings));
 router.get("/bookings", isLoggedIn, wrapAsync(getUserBookings));
 

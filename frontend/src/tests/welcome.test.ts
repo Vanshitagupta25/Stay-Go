@@ -33,12 +33,12 @@ test('welcome rotation is slow and subtle', () => {
   assert.ok(WELCOME_ROTATION_MS >= 4000);
 });
 
-test('welcome animation timeline follows the requested 0-1-2-3-4 second order', () => {
+test('welcome animation timeline shows logo/title in 0-1s and description in 1-2s', () => {
   assert.equal(WELCOME_TIMINGS.logo, 0);
-  assert.equal(WELCOME_TIMINGS.title, 1000);
-  assert.equal(WELCOME_TIMINGS.tagline, 2000);
-  assert.equal(WELCOME_TIMINGS.destinations, 3000);
-  assert.equal(WELCOME_TIMINGS.cta, 4000);
+  assert.ok(WELCOME_TIMINGS.title > 0 && WELCOME_TIMINGS.title < 1000);
+  assert.ok(WELCOME_TIMINGS.tagline >= 1000 && WELCOME_TIMINGS.tagline < 2000);
+  assert.ok(WELCOME_TIMINGS.destinations >= 2000);
+  assert.ok(WELCOME_TIMINGS.cta >= WELCOME_TIMINGS.destinations);
 
   const ordered = [
     WELCOME_TIMINGS.logo,

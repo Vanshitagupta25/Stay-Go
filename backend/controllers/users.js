@@ -1,6 +1,14 @@
 const User = require("../models/user.js");
 const { sendResponse } = require("../utils/responseHandler");
 
+const toSafeUser = (user) => {
+  if (!user) return null;
+  const obj = user.toObject ? user.toObject() : { ...user };
+  delete obj.hash;
+  delete obj.salt;
+  return obj;
+};
+
 module.exports.renderSignupForm = (req, res) => {
   res.render("signup.ejs");
 };
@@ -21,16 +29,20 @@ module.exports.userSignup = async (req, res, next) => {
 
     req.login(registeredUser, (err) => {
       if (err) return next(err);
-      return sendResponse(req, res, {
-        statusCode: 200,
-        message: "Welcome to Stay-Go",
-        data: { user: registeredUser },
-        redirectUrl: "/listings",
+      req.session.save((saveErr) => {
+        if (saveErr) return next(saveErr);
+        return sendResponse(req, res, {
+          statusCode: 200,
+          message: "Welcome to Stay-Go",
+          data: { user: toSafeUser(registeredUser) },
+          redirectUrl: "/listings",
+        });
       });
     });
   } catch (e) {
+    const statusCode = e?.name === "UserExistsError" ? 409 : 400;
     return sendResponse(req, res, {
-      statusCode: 400,
+      statusCode,
       message: e.message,
       redirectUrl: "/signup",
     });
@@ -41,18 +53,25 @@ module.exports.renderLoginForm = (req, res) => {
   res.render("login.ejs");
 };
 
-module.exports.userLogin = async (req, res) => {
-  let redirectUrl = res.locals.redirectUrl || "/listings";
-  if (req.user) {
-    await User.findByIdAndUpdate(req.user._id, { lastActive: new Date() });
-    req.user.lastActive = new Date();
+module.exports.userLogin = async (req, res, next) => {
+  try {
+    let redirectUrl = res.locals.redirectUrl || "/listings";
+    if (req.user) {
+      await User.findByIdAndUpdate(req.user._id, { lastActive: new Date() });
+      req.user.lastActive = new Date();
+    }
+    req.session.save((err) => {
+      if (err) return next(err);
+      return sendResponse(req, res, {
+        statusCode: 200,
+        message: "Welcome back to Stay-Go",
+        data: { user: toSafeUser(req.user) },
+        redirectUrl,
+      });
+    });
+  } catch (err) {
+    return next(err);
   }
-  return sendResponse(req, res, {
-    statusCode: 200,
-    message: "Welcome back to Stay-Go",
-    data: { user: req.user },
-    redirectUrl,
-  });
 };
 
 module.exports.userLogout = (req, res, next) => {

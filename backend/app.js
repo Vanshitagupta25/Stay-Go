@@ -33,23 +33,34 @@ async function main() {
 
 const cors = require("cors");
 
+const isProduction = process.env.NODE_ENV === "production";
+app.set("trust proxy", 1);
+
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:3000",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
+  ...(process.env.FRONTEND_URL || process.env.CLIENT_URL || "")
+    .split(",")
+    .map((origin) => origin.trim().replace(/\/+$/, ""))
+    .filter(Boolean),
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+    const normalizedOrigin = origin.replace(/\/+$/, "");
+    if (
+      allowedOrigins.includes(normalizedOrigin) ||
+      /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalizedOrigin)
+    ) {
       return callback(null, true);
     }
     return callback(new Error("Not allowed by CORS"));
   },
-  credentials: true
+  credentials: true,
 }));
 
 app.set("view engine", "ejs");
@@ -74,15 +85,35 @@ store.on("error", (err) => {
   console.log("ERROR IN MONGO SESSION STORE", err);
 });
 
+const cookieSameSiteEnv = (process.env.COOKIE_SAMESITE || "").toLowerCase();
+const cookieSecureEnv = process.env.COOKIE_SECURE;
+
+const cookieSameSite =
+  cookieSameSiteEnv === "none" || cookieSameSiteEnv === "lax" || cookieSameSiteEnv === "strict"
+    ? cookieSameSiteEnv
+    : isProduction
+      ? "none"
+      : "lax";
+
+const cookieSecure =
+  cookieSecureEnv === "true"
+    ? true
+    : cookieSecureEnv === "false"
+      ? false
+      : isProduction;
+
 const sessionConfig = {
   store,
+  name: "staygo.sid",
   secret: process.env.SECRET || "mysupersecretcode",
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
+  proxy: true,
   cookie: {
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
+    secure: cookieSecure,
+    sameSite: cookieSameSite,
   },
 };
 
