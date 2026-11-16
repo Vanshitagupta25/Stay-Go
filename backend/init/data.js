@@ -364,7 +364,7 @@ const sampleListings = [
     description: "Eco-friendly sustainable bamboo cottage nestled beside a crystal-clear mountain stream.",
     image: {
       filename: "listing[image]",
-      url: "https://images.unsplash.com/photo-1507038772120-7ffe76f79d0d?auto=format&fit=crop&w=800&q=60",
+      url: "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&w=800&q=80",
     },
     price: 1700,
     location: "Wayanad",

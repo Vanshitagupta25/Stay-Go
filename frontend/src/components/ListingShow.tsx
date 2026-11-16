@@ -73,15 +73,15 @@ export const ListingShow: React.FC<ListingShowProps> = ({
   const bookedDates = availabilityData?.bookedDates || [];
   const isRangeUnavailable = Boolean(
     checkIn &&
-      checkOut &&
-      (isRangeBooked(checkIn, checkOut, bookedDates) ||
-        (confirmedRange &&
-          rangesOverlap(
-            checkIn,
-            checkOut,
-            confirmedRange.checkIn,
-            confirmedRange.checkOut
-          )))
+    checkOut &&
+    (isRangeBooked(checkIn, checkOut, bookedDates) ||
+      (confirmedRange &&
+        rangesOverlap(
+          checkIn,
+          checkOut,
+          confirmedRange.checkIn,
+          confirmedRange.checkOut
+        )))
   );
 
   const [rating, setRating] = useState<number>(5);
@@ -178,13 +178,13 @@ export const ListingShow: React.FC<ListingShowProps> = ({
 
   return (
     <div className="min-h-screen bg-[#faf9f7] text-gray-900">
-      
+
       <div className="sticky top-0 z-40 flex items-center justify-between border-b border-black/5 bg-white/85 px-4 py-3 shadow-[0_1px_2px_rgba(28,25,23,0.04)] backdrop-blur-md sm:px-8">
         <motion.button
           onClick={onClose}
           whileHover={prefersReducedMotion ? undefined : { x: -2 }}
           whileTap={prefersReducedMotion ? undefined : { scale: 0.94 }}
-          className="flex cursor-pointer items-center gap-2 rounded-full px-3 py-2 transition hover:bg-gray-100"
+          className="flex cursor-pointer items-center gap-2 rounded-full px-3 py-2 transition"
         >
           <ArrowLeft className="h-5 w-5 text-gray-700" />
           <span className="text-sm font-semibold text-gray-700">Back to stays</span>
@@ -193,13 +193,12 @@ export const ListingShow: React.FC<ListingShowProps> = ({
           <motion.button
             onClick={onToggleFavorite}
             whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
-            className="flex cursor-pointer items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-sm font-semibold text-gray-800 shadow-sm transition hover:border-rose-200 hover:bg-rose-50 hover:text-[#fe424d]"
+            className="flex cursor-pointer items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-sm font-semibold text-gray-800 shadow-sm transition"
             title={isFavorite ? "Saved in wishlist" : "Save to wishlist"}
           >
             <Heart
-              className={`h-4.5 w-4.5 transition-colors ${
-                isFavorite ? 'fill-[#fe424d] text-[#fe424d]' : 'text-gray-700'
-              }`}
+              className={`h-4.5 w-4.5 transition-colors ${isFavorite ? 'fill-[#fe424d] text-[#fe424d]' : 'text-gray-700'
+                }`}
             />
             <span>{isFavorite ? 'Saved' : 'Save'}</span>
           </motion.button>
@@ -207,7 +206,7 @@ export const ListingShow: React.FC<ListingShowProps> = ({
       </div>
 
       <main className="mx-auto max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-8">
-        
+
         <Reveal>
           <div className="mb-6">
             <div className="flex flex-wrap items-center gap-2">
@@ -244,7 +243,7 @@ export const ListingShow: React.FC<ListingShowProps> = ({
           </div>
         </Reveal>
 
-        
+
         <Reveal offset={18}>
           <ListingGallery
             listing={listing}
@@ -253,9 +252,9 @@ export const ListingShow: React.FC<ListingShowProps> = ({
           />
         </Reveal>
 
-        
+
         <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-3 lg:gap-12">
-          
+
           <div className="space-y-8 lg:col-span-2">
             <Reveal delay={0.05}>
               <div className="border-b border-gray-200/80 pb-4">
@@ -263,12 +262,12 @@ export const ListingShow: React.FC<ListingShowProps> = ({
               </div>
             </Reveal>
 
-            
+
             <Reveal delay={0.08}>
               <StayAmenities listing={listing} />
             </Reveal>
 
-            
+
             <Reveal delay={0.11}>
               <TwoMonthCalendar
                 checkIn={checkIn}
@@ -283,7 +282,7 @@ export const ListingShow: React.FC<ListingShowProps> = ({
             </Reveal>
           </div>
 
-          
+
           <div className="lg:col-span-1">
             <Reveal delay={0.1}>
               <div className="sticky top-24">
@@ -342,7 +341,7 @@ export const ListingShow: React.FC<ListingShowProps> = ({
           </div>
         </div>
 
-        
+
         <Reveal>
           <div className="mt-14 border-t border-gray-200/80 pt-10">
             <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -365,185 +364,184 @@ export const ListingShow: React.FC<ListingShowProps> = ({
               )}
             </div>
 
-          
-          {currentUser ? (
-            <div className="mb-12 rounded-3xl border border-gray-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(28,25,23,0.04),0_20px_50px_-36px_rgba(28,25,23,0.35)] sm:p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-[#fe424d] text-white flex items-center justify-center font-bold text-base uppercase">
-                  {currentUser.username?.charAt(0) || 'U'}
-                </div>
-                <div>
-                  <h4 className="text-base font-semibold text-gray-900">Leave a Review</h4>
-                  <p className="text-xs text-gray-500">Logged in as @{currentUser.username}</p>
-                </div>
-              </div>
 
-              {reviewSuccess && (
-                <div className="mb-4 p-3.5 bg-green-50 border border-green-200 text-green-700 text-sm rounded-xl flex items-center gap-2">
-                  <span>✓</span> {reviewSuccess}
-                </div>
-              )}
-
-              {reviewError && (
-                <div className="mb-4 p-3.5 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl">
-                  {reviewError}
-                </div>
-              )}
-
-              <form onSubmit={handleReviewSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
-                    Rating
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center space-x-1">
-                      {[1, 2, 3, 4, 5].map((starValue) => {
-                        const isFilled = starValue <= (hoverRating || rating);
-                        return (
-                          <button
-                            type="button"
-                            key={starValue}
-                            onClick={() => setRating(starValue)}
-                            onMouseEnter={() => setHoverRating(starValue)}
-                            onMouseLeave={() => setHoverRating(0)}
-                            className="cursor-pointer p-1 text-gray-300 transition hover:scale-110 hover:text-yellow-400 active:scale-95"
-                            aria-label={`${starValue} star`}
-                          >
-                            <Star
-                              className={`w-6 h-6 ${
-                                isFilled
-                                  ? 'text-yellow-400 fill-current'
-                                  : 'text-gray-300'
-                              }`}
-                            />
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <span className="text-xs font-medium text-gray-600 ml-2">
-                      {ratingDescriptions[hoverRating || rating]}
-                    </span>
+            {currentUser ? (
+              <div className="mb-12 rounded-3xl border border-gray-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(28,25,23,0.04),0_20px_50px_-36px_rgba(28,25,23,0.35)] sm:p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-[#fe424d] text-white flex items-center justify-center font-bold text-base uppercase">
+                    {currentUser.username?.charAt(0) || 'U'}
+                  </div>
+                  <div>
+                    <h4 className="text-base font-semibold text-gray-900">Leave a Review</h4>
+                    <p className="text-xs text-gray-500">Logged in as @{currentUser.username}</p>
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
-                    Your Experience & Comments
-                  </label>
-                  <textarea
-                    rows={4}
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    placeholder="Describe your experience with the host, cleanliness, location, check-in process, and amenities..."
-                    required
-                    className="w-full rounded-2xl border border-gray-200 bg-gray-50/50 p-3.5 text-sm text-gray-900 placeholder-gray-400 transition focus:border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-gray-900"
-                  />
-                </div>
+                {reviewSuccess && (
+                  <div className="mb-4 p-3.5 bg-green-50 border border-green-200 text-green-700 text-sm rounded-xl flex items-center gap-2">
+                    <span>✓</span> {reviewSuccess}
+                  </div>
+                )}
 
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={isSubmittingReview}
-                    className="flex cursor-pointer items-center gap-2 rounded-full bg-[#fe424d] px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#e03a45] hover:shadow-md disabled:opacity-50 disabled:hover:translate-y-0"
-                  >
-                    {isSubmittingReview ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                        <span>Submitting...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-4 h-4" />
-                        <span>Submit Review</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            </div>
-          ) : (
-            <div className="mb-12 rounded-3xl border border-gray-200/80 bg-white p-8 text-center shadow-sm">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-[#fe424d]">
-                <MessageSquare className="h-6 w-6" />
+                {reviewError && (
+                  <div className="mb-4 p-3.5 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl">
+                    {reviewError}
+                  </div>
+                )}
+
+                <form onSubmit={handleReviewSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                      Rating
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center space-x-1">
+                        {[1, 2, 3, 4, 5].map((starValue) => {
+                          const isFilled = starValue <= (hoverRating || rating);
+                          return (
+                            <button
+                              type="button"
+                              key={starValue}
+                              onClick={() => setRating(starValue)}
+                              onMouseEnter={() => setHoverRating(starValue)}
+                              onMouseLeave={() => setHoverRating(0)}
+                              className="cursor-pointer p-1 text-gray-300 transition hover:scale-110 hover:text-yellow-400 active:scale-95"
+                              aria-label={`${starValue} star`}
+                            >
+                              <Star
+                                className={`w-6 h-6 ${isFilled
+                                    ? 'text-yellow-400 fill-current'
+                                    : 'text-gray-300'
+                                  }`}
+                              />
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <span className="text-xs font-medium text-gray-600 ml-2">
+                        {ratingDescriptions[hoverRating || rating]}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                      Your Experience & Comments
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      placeholder="Describe your experience with the host, cleanliness, location, check-in process, and amenities..."
+                      required
+                      className="w-full rounded-2xl border border-gray-200 bg-gray-50/50 p-3.5 text-sm text-gray-900 placeholder-gray-400 transition focus:border-transparent focus:bg-white focus:outline-none focus:ring-2 focus:ring-gray-900"
+                    />
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      disabled={isSubmittingReview}
+                      className="flex cursor-pointer items-center gap-2 rounded-full bg-[#fe424d] px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#e03a45] hover:shadow-md disabled:opacity-50 disabled:hover:translate-y-0"
+                    >
+                      {isSubmittingReview ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                          <span>Submitting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4" />
+                          <span>Submit Review</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
               </div>
-              <h4 className="text-base font-semibold text-gray-800">Have you stayed here?</h4>
-              <p className="mx-auto mt-1 max-w-md text-sm text-gray-500">
-                Log in to rate this property and share your travel experience with the community.
-              </p>
-              {onOpenAuthModal && (
-                <button
-                  type="button"
-                  onClick={() => onOpenAuthModal('login')}
-                  className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#fe424d] px-5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#e03a44] hover:shadow-md"
-                >
-                  Log In to Review
-                </button>
-              )}
-            </div>
-          )}
+            ) : (
+              <div className="mb-12 rounded-3xl border border-gray-200/80 bg-white p-8 text-center shadow-sm">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-[#fe424d]">
+                  <MessageSquare className="h-6 w-6" />
+                </div>
+                <h4 className="text-base font-semibold text-gray-800">Have you stayed here?</h4>
+                <p className="mx-auto mt-1 max-w-md text-sm text-gray-500">
+                  Log in to rate this property and share your travel experience with the community.
+                </p>
+                {onOpenAuthModal && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenAuthModal('login')}
+                    className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#fe424d] px-5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#e03a44] hover:shadow-md"
+                  >
+                    Log In to Review
+                  </button>
+                )}
+              </div>
+            )}
 
-          
-          {reviewsList.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
-              {reviewsList.map((review: any) => {
-                const authorId = review.author?._id || review.author;
-                const isAuthor = currentUser && (authorId === currentUser._id || authorId === currentUser.id);
 
-                return (
-                  <div key={review._id} className="space-y-3 rounded-2xl border border-gray-200/70 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-50 font-bold uppercase text-[#fe424d]">
-                          {review.author?.username?.charAt(0) || 'G'}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-sm text-gray-900">
-                            {review.author?.username || 'Guest'}
-                          </p>
-                          <p className="text-gray-400 text-xs">
-                            {review.createdAt
-                              ? new Date(review.createdAt).toLocaleDateString('en-US', {
+            {reviewsList.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                {reviewsList.map((review: any) => {
+                  const authorId = review.author?._id || review.author;
+                  const isAuthor = currentUser && (authorId === currentUser._id || authorId === currentUser.id);
+
+                  return (
+                    <div key={review._id} className="space-y-3 rounded-2xl border border-gray-200/70 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-50 font-bold uppercase text-[#fe424d]">
+                            {review.author?.username?.charAt(0) || 'G'}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-sm text-gray-900">
+                              {review.author?.username || 'Guest'}
+                            </p>
+                            <p className="text-gray-400 text-xs">
+                              {review.createdAt
+                                ? new Date(review.createdAt).toLocaleDateString('en-US', {
                                   month: 'short',
                                   year: 'numeric',
                                 })
-                              : 'Recently'}
-                          </p>
+                                : 'Recently'}
+                            </p>
+                          </div>
                         </div>
+
+                        {isAuthor && (
+                          <button
+                            type="button"
+                            onClick={() => handleReviewDelete(review._id)}
+                            className="text-gray-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition cursor-pointer"
+                            title="Delete your review"
+                            aria-label="Delete review"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
 
-                      {isAuthor && (
-                        <button
-                          type="button"
-                          onClick={() => handleReviewDelete(review._id)}
-                          className="text-gray-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition cursor-pointer"
-                          title="Delete your review"
-                          aria-label="Delete review"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
+                      <div className="flex items-center space-x-1">
+                        {[...Array(Number(review.rating) || 5)].map((_, i) => (
+                          <Star key={i} className="w-3.5 h-3.5 text-yellow-500 fill-current" />
+                        ))}
+                      </div>
 
-                    <div className="flex items-center space-x-1">
-                      {[...Array(Number(review.rating) || 5)].map((_, i) => (
-                        <Star key={i} className="w-3.5 h-3.5 text-yellow-500 fill-current" />
-                      ))}
+                      <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
+                        {review.comment}
+                      </p>
                     </div>
-
-                    <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
-                      {review.comment}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-sm">No reviews yet. Be the first to leave one above!</p>
-          )}
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-sm">No reviews yet. Be the first to leave one above!</p>
+            )}
           </div>
         </Reveal>
 
-        
+
         <Reveal>
           <div className="mt-14 border-t border-gray-200/80 pt-10">
             <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
@@ -559,23 +557,23 @@ export const ListingShow: React.FC<ListingShowProps> = ({
               </span>
             </div>
             <div className="relative z-0 flex h-96 w-full items-center justify-center overflow-hidden rounded-3xl border border-gray-200/80 bg-gray-100 shadow-inner">
-            {listing.geometry?.coordinates ? (
-              <MapContainer
-                key={listing._id || `${listing.geometry.coordinates[1]}-${listing.geometry.coordinates[0]}`}
-                center={[listing.geometry.coordinates[1], listing.geometry.coordinates[0]]}
-                zoom={13}
-                scrollWheelZoom={false}
-                className="w-full h-full"
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
-                  url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
-                />
-                <Marker position={[listing.geometry.coordinates[1], listing.geometry.coordinates[0]]} />
-              </MapContainer>
-            ) : (
-              <p className="text-gray-500">Map view unavailable</p>
-            )}
+              {listing.geometry?.coordinates ? (
+                <MapContainer
+                  key={listing._id || `${listing.geometry.coordinates[1]}-${listing.geometry.coordinates[0]}`}
+                  center={[listing.geometry.coordinates[1], listing.geometry.coordinates[0]]}
+                  zoom={13}
+                  scrollWheelZoom={false}
+                  className="w-full h-full"
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
+                    url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+                  />
+                  <Marker position={[listing.geometry.coordinates[1], listing.geometry.coordinates[0]]} />
+                </MapContainer>
+              ) : (
+                <p className="text-gray-500">Map view unavailable</p>
+              )}
             </div>
           </div>
         </Reveal>

@@ -772,7 +772,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center gap-2.5 shrink-0">
             <button
               onClick={onOpenCreateModal}
-              className="hidden lg:block text-xs sm:text-sm font-semibold text-gray-800 hover:bg-gray-100 px-3.5 py-2 rounded-full transition cursor-pointer"
+              className="hidden lg:block text-xs sm:text-sm font-semibold text-gray-800 px-3.5 py-2 rounded-full transition cursor-pointer"
             >
               Host on Stay-Go
             </button>
@@ -892,7 +892,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                             setIsProfileDropdownOpen(false);
                             onOpenCreateModal();
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer lg:hidden"
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-xs sm:text-sm font-medium text-gray-700 transition cursor-pointer lg:hidden"
                           role="menuitem"
                         >
                           <div className="w-7 h-7 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center">
