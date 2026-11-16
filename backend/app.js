@@ -37,7 +37,7 @@ async function main() {
 
 const cors = require("cors");
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV;
 app.set("trust proxy", 1);
 
 const allowedOrigins = [
@@ -55,16 +55,18 @@ const allowedOrigins = [
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    const normalizedOrigin = origin.replace(/\/+$/, "");
+    const normalizedOrigin = origin.trim().replace(/\/+$/, "");
     if (
       allowedOrigins.includes(normalizedOrigin) ||
-      /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalizedOrigin)
+      /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalizedOrigin)
     ) {
       return callback(null, true);
     }
-    return callback(new Error("Not allowed by CORS"));
+    return callback(null, false);
   },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "Accept", "X-Requested-With"],
 }));
 
 app.set("view engine", "ejs");
@@ -131,10 +133,10 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
-  res.locals.info = req.flash("info");
-  res.locals.error = req.flash("error");
+  res.locals.info = typeof req.flash === "function" ? req.flash("info") : [];
+  res.locals.error = typeof req.flash === "function" ? req.flash("error") : [];
   res.locals.currUser = req.user || null;
-  res.locals.searchHistory = req.session.searchHistory || [];
+  res.locals.searchHistory = (req.session && req.session.searchHistory) || [];
   next();
 });
 app.get("/", (req, res) => {
@@ -161,10 +163,11 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  const fs = require('fs');
-  fs.appendFileSync('error.log', new Date().toISOString() + ' ' + (err.stack || err) + '\n');
-  let { status = 500, statusCode = status, message = "Something went wrong!" } = err;
-  
+  try {
+    const fs = require('fs');
+    fs.appendFileSync('error.log', new Date().toISOString() + ' ' + (err.stack || err) + '\n');
+  } catch (_) { }
+  const { status = 500, statusCode = status, message = "Something went wrong!" } = err || {};
   return sendResponse(req, res, {
     statusCode,
     message,
