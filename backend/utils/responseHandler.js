@@ -26,7 +26,7 @@ const sendResponse = (req, res, options = {}) => {
     return res.status(statusCode).json(payload);
   }
 
-  if (message && flashType) {
+  if (message && flashType && typeof req.flash === "function") {
     req.flash(flashType, message);
   }
 
