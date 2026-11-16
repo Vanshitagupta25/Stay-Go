@@ -48,7 +48,6 @@ export const BookingsModal: React.FC<BookingsModalProps> = ({
     };
   }, [isOpen]);
 
-  // Handle ESC key
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -98,7 +97,7 @@ export const BookingsModal: React.FC<BookingsModalProps> = ({
       >
       <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 fade-in duration-200">
         
-        {/* Modal Header */}
+        
         <div className="px-6 py-4.5 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
@@ -123,7 +122,7 @@ export const BookingsModal: React.FC<BookingsModalProps> = ({
           </button>
         </div>
 
-        {/* Modal Body */}
+        
         <div className="p-6 overflow-y-auto flex-1 bg-gray-50/40">
           {loading && (
             <div className="flex flex-col items-center justify-center py-20 text-gray-400">
@@ -180,7 +179,7 @@ export const BookingsModal: React.FC<BookingsModalProps> = ({
                     className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"
                   >
                     <div className="flex items-center gap-4 min-w-0 flex-1">
-                      {/* Listing Image */}
+                      
                       <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-gray-100 shrink-0 border border-gray-100">
                         {listing.image?.url ? (
                           <img
@@ -195,7 +194,7 @@ export const BookingsModal: React.FC<BookingsModalProps> = ({
                         )}
                       </div>
 
-                      {/* Booking Details */}
+                      
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <span
@@ -234,7 +233,7 @@ export const BookingsModal: React.FC<BookingsModalProps> = ({
                       </div>
                     </div>
 
-                    {/* Right Price & Actions */}
+                    
                     <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100 shrink-0 gap-2">
                       <div className="text-left sm:text-right">
                         <div className="text-xs text-gray-400">Total Paid</div>
@@ -264,7 +263,7 @@ export const BookingsModal: React.FC<BookingsModalProps> = ({
           )}
         </div>
 
-        {/* Footer */}
+        
         <div className="px-6 py-3 border-t border-gray-100 flex items-center justify-end bg-gray-50/60">
           <button
             type="button"

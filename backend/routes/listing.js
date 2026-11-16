@@ -10,7 +10,6 @@ const upload = multer({ storage });
 
 
 
-// create router
 router.route("/")
 .get(wrapAsync(listingController.index))
 .post(
@@ -20,8 +19,6 @@ router.route("/")
   wrapAsync(listingController.create)
 );
 
-
-// new route
 router.get("/new", isLoggedIn,listingController.new);
 
 router.get("/:id/availability", wrapAsync(listingController.availability));
@@ -41,7 +38,6 @@ router.route("/:id")
   wrapAsync(listingController.delete)
 );
 
-//edit route
 router.get(
   "/:id/edit",
   isLoggedIn,

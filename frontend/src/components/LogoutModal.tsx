@@ -21,7 +21,6 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Close on Escape key press
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -66,7 +65,7 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
       >
       <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-gray-100 relative animate-in zoom-in-95 fade-in duration-200">
         
-        {/* Close Button */}
+        
         <button
           type="button"
           onClick={onClose}
@@ -78,7 +77,7 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
           <X className="w-4 h-4" />
         </button>
 
-        {/* Header Icon */}
+        
         <div className="flex items-center gap-3.5 mb-4">
           <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-[#fe424d] shadow-2xs">
             <LogOut className="w-6 h-6 stroke-[2.2]" />
@@ -93,7 +92,7 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
           </div>
         </div>
 
-        {/* User Card (if user information is available) */}
+        
         {(username || email) && (
           <div className="bg-gray-50 border border-gray-150 rounded-2xl p-3 sm:p-3.5 mb-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#fe424d] text-white font-bold text-sm flex items-center justify-center ring-2 ring-white shadow-2xs shrink-0 select-none">
@@ -110,12 +109,12 @@ export const LogoutModal: React.FC<LogoutModalProps> = ({
           </div>
         )}
 
-        {/* Modal Description */}
+        
         <p className="text-sm text-gray-600 mb-6 leading-relaxed">
           {message}
         </p>
 
-        {/* Action Buttons */}
+        
         <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
           <button
             type="button"

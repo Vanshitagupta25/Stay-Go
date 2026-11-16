@@ -30,7 +30,6 @@ function parseAmenities(value) {
         return parsed.map((item) => String(item).trim()).filter(Boolean);
       }
     } catch {
-      // Fall through to comma-separated parsing for legacy form payloads.
     }
 
     return trimmed.split(',').map((item) => item.trim()).filter(Boolean);

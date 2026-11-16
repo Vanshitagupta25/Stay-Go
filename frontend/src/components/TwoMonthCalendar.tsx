@@ -21,7 +21,6 @@ export const TwoMonthCalendar: React.FC<TwoMonthCalendarProps> = ({
   compact = false,
 }) => {
   const today = React.useMemo(() => new Date(), []);
-  // Anchor to 1st of current month
   const [currentMonthDate, setCurrentMonthDate] = useState<Date>(() =>
     new Date(today.getFullYear(), today.getMonth(), 1)
   );
@@ -62,23 +61,18 @@ export const TwoMonthCalendar: React.FC<TwoMonthCalendarProps> = ({
     if (dateStr < todayStr || isNightBooked(dateStr, bookedDates)) return;
 
     if (!checkIn || (checkIn && checkOut)) {
-      // Start a new selection
       onDatesChange(dateStr, '');
     } else if (checkIn && !checkOut) {
       if (dateStr < checkIn) {
-        // Clicked an earlier date, make it new checkIn
         onDatesChange(dateStr, '');
       } else if (dateStr === checkIn) {
-        // Deselect
         onDatesChange('', '');
       } else if (!isRangeBooked(checkIn, dateStr, bookedDates)) {
-        // Complete range only when it does not cross a booked night
         onDatesChange(checkIn, dateStr);
       }
     }
   };
 
-  // Helper to calculate total nights
   const calculateNights = (): number => {
     if (!checkIn || !checkOut) return 0;
     const [y1, m1, d1] = checkIn.split('-').map(Number);
@@ -111,7 +105,7 @@ export const TwoMonthCalendar: React.FC<TwoMonthCalendarProps> = ({
 
     return (
       <div className={`flex-1 ${compact ? 'min-w-[210px] sm:min-w-[230px]' : 'min-w-[280px]'}`}>
-        {/* Month Header */}
+        
         <div className={`flex items-center justify-between ${compact ? 'mb-2 h-7' : 'mb-4 h-9'}`}>
           {isLeft ? (
             <button
@@ -145,7 +139,7 @@ export const TwoMonthCalendar: React.FC<TwoMonthCalendarProps> = ({
           )}
         </div>
 
-        {/* Days of week */}
+        
         <div className={`grid grid-cols-7 text-center ${compact ? 'mb-1 text-[11px]' : 'mb-2 text-xs'} font-semibold text-gray-400`}>
           {daysOfWeek.map((d, idx) => (
             <div key={idx} className={compact ? 'py-0.5' : 'py-1'}>
@@ -154,7 +148,7 @@ export const TwoMonthCalendar: React.FC<TwoMonthCalendarProps> = ({
           ))}
         </div>
 
-        {/* Days grid */}
+        
         <div className="grid grid-cols-7 gap-y-0.5 text-center">
           {blanks.map((_, i) => (
             <div key={`blank-${i}`} className={compact ? 'h-8' : 'h-10'} />
@@ -231,7 +225,7 @@ export const TwoMonthCalendar: React.FC<TwoMonthCalendarProps> = ({
 
   return (
     <div className={compact ? 'w-full' : 'pb-8'}>
-      {/* Calendar Header with Title & Clear Dates button */}
+      
       {!compact && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
           <div>
@@ -266,7 +260,7 @@ export const TwoMonthCalendar: React.FC<TwoMonthCalendarProps> = ({
         </div>
       )}
 
-      {/* Two Month Calendars Side-by-Side */}
+      
       <div className={`flex flex-col sm:flex-row ${compact ? 'gap-4 sm:gap-6' : 'gap-8 rounded-3xl border border-gray-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(28,25,23,0.04),0_18px_44px_-36px_rgba(28,25,23,0.35)] sm:p-6 lg:gap-12'}`}>
         {renderMonth(currentMonthDate, true)}
         {renderMonth(nextMonthDate, false)}

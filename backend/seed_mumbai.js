@@ -110,7 +110,6 @@ async function run() {
       owner: ownerUser._id,
     }));
 
-    // Avoid duplicates if titles already exist
     for (const doc of docs) {
       const existing = await Listing.findOne({ title: doc.title });
       if (!existing) {

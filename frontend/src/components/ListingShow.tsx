@@ -18,7 +18,6 @@ import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Fix for default marker icon in leaflet with bundlers
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
@@ -85,7 +84,6 @@ export const ListingShow: React.FC<ListingShowProps> = ({
           )))
   );
 
-  // Review Form States
   const [rating, setRating] = useState<number>(5);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [comment, setComment] = useState<string>('');
@@ -128,9 +126,10 @@ export const ListingShow: React.FC<ListingShowProps> = ({
   const handleReviewDelete = async (reviewId: string) => {
     if (!window.confirm("Are you sure you want to delete this review?")) return;
     try {
+      setReviewError('');
       await deleteReview({ listingId: listing._id, reviewId }).unwrap();
     } catch (err: any) {
-      alert(err?.data?.message || "Failed to delete review.");
+      setReviewError(err?.data?.message || "Failed to delete review.");
     }
   };
 
@@ -179,7 +178,7 @@ export const ListingShow: React.FC<ListingShowProps> = ({
 
   return (
     <div className="min-h-screen bg-[#faf9f7] text-gray-900">
-      {/* Header Bar */}
+      
       <div className="sticky top-0 z-40 flex items-center justify-between border-b border-black/5 bg-white/85 px-4 py-3 shadow-[0_1px_2px_rgba(28,25,23,0.04)] backdrop-blur-md sm:px-8">
         <motion.button
           onClick={onClose}
@@ -208,7 +207,7 @@ export const ListingShow: React.FC<ListingShowProps> = ({
       </div>
 
       <main className="mx-auto max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-8">
-        {/* Title Section */}
+        
         <Reveal>
           <div className="mb-6">
             <div className="flex flex-wrap items-center gap-2">
@@ -245,7 +244,7 @@ export const ListingShow: React.FC<ListingShowProps> = ({
           </div>
         </Reveal>
 
-        {/* Hero Image */}
+        
         <Reveal offset={18}>
           <ListingGallery
             listing={listing}
@@ -254,31 +253,22 @@ export const ListingShow: React.FC<ListingShowProps> = ({
           />
         </Reveal>
 
-        {/* Content Grid */}
+        
         <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-3 lg:gap-12">
-          {/* Left Column - Details & Two-Month Calendar */}
+          
           <div className="space-y-8 lg:col-span-2">
             <Reveal delay={0.05}>
-              <div className="flex items-center justify-between gap-4 border-b border-gray-200/80 pb-6">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl">
-                    {listing.category} hosted by {ownerName}
-                  </h2>
-                  {capacitySummary && (
-                    <p className="mt-1.5 text-sm text-gray-500">
-                      {capacitySummary}
-                    </p>
-                  )}
-                </div>
+              <div className="border-b border-gray-200/80 pb-4">
+                <p className="text-sm font-medium text-gray-700">Hosted by {ownerName}</p>
               </div>
             </Reveal>
 
-            {/* Stay Amenities Section - Dynamic as per each villa, shown before the calendar */}
+            
             <Reveal delay={0.08}>
               <StayAmenities listing={listing} />
             </Reveal>
 
-            {/* Two-Month Calendar Component (Positioned to the left of the booking box) */}
+            
             <Reveal delay={0.11}>
               <TwoMonthCalendar
                 checkIn={checkIn}
@@ -293,7 +283,7 @@ export const ListingShow: React.FC<ListingShowProps> = ({
             </Reveal>
           </div>
 
-          {/* Right Column - Sticky Booking Widget */}
+          
           <div className="lg:col-span-1">
             <Reveal delay={0.1}>
               <div className="sticky top-24">
@@ -352,7 +342,7 @@ export const ListingShow: React.FC<ListingShowProps> = ({
           </div>
         </div>
 
-        {/* Reviews Section */}
+        
         <Reveal>
           <div className="mt-14 border-t border-gray-200/80 pt-10">
             <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -375,7 +365,7 @@ export const ListingShow: React.FC<ListingShowProps> = ({
               )}
             </div>
 
-          {/* Add Review Form for Logged-In User */}
+          
           {currentUser ? (
             <div className="mb-12 rounded-3xl border border-gray-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(28,25,23,0.04),0_20px_50px_-36px_rgba(28,25,23,0.35)] sm:p-8">
               <div className="flex items-center gap-3 mb-4">
@@ -484,7 +474,7 @@ export const ListingShow: React.FC<ListingShowProps> = ({
                 <button
                   type="button"
                   onClick={() => onOpenAuthModal('login')}
-                  className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-black hover:shadow-md"
+                  className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#fe424d] px-5 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#e03a44] hover:shadow-md"
                 >
                   Log In to Review
                 </button>
@@ -492,7 +482,7 @@ export const ListingShow: React.FC<ListingShowProps> = ({
             </div>
           )}
 
-          {/* List of Existing Reviews */}
+          
           {reviewsList.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
               {reviewsList.map((review: any) => {
@@ -553,7 +543,7 @@ export const ListingShow: React.FC<ListingShowProps> = ({
           </div>
         </Reveal>
 
-        {/* Where you'll be (Map moved to the very end) */}
+        
         <Reveal>
           <div className="mt-14 border-t border-gray-200/80 pt-10">
             <div className="mb-6 flex flex-wrap items-end justify-between gap-3">

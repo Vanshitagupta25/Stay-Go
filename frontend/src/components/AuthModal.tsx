@@ -111,7 +111,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           type="button"
           onClick={onClose}
           aria-label="Close authentication dialog"
-          className="absolute right-4 top-4 cursor-pointer rounded-full p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+          className="absolute right-4 top-4 cursor-pointer rounded-xl bg-gray-100 p-2 text-gray-500"
         >
           <X className="h-5 w-5" />
         </button>
@@ -134,7 +134,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </p>
         </div>
 
-        {/* Mode Tabs */}
+        
         <div className="mb-5 grid grid-cols-2 gap-1 rounded-full bg-gray-100 p-1">
           <button
             type="button"

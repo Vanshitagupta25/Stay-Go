@@ -29,7 +29,6 @@ test('STAY_AMENITIES_MAP defines all standard amenities with titles, description
 });
 
 test('getAmenitiesForListing returns dynamic facilities when explicitly defined on a villa', () => {
-  // Villa 1: Luxury Pool Villa with only Pool and AC
   const villa1 = {
     _id: 'v1',
     title: 'Private Pool Villa',
@@ -39,7 +38,6 @@ test('getAmenitiesForListing returns dynamic facilities when explicitly defined 
   assert.strictEqual(res1.length, 2);
   assert.deepStrictEqual(res1.map(a => a.key), ['pool', 'ac']);
 
-  // Villa 2: Remote Mountain Cabin with Wi-Fi, Parking, and Steam Bath (no pool)
   const villa2 = {
     _id: 'v2',
     title: 'Himalayan Wooden Chalet',
@@ -64,7 +62,6 @@ test('getAmenitiesForListing normalizes case-insensitive amenity names and title
 });
 
 test('getAmenitiesForListing dynamically derives facilities when amenities array is empty [] from DB', () => {
-  // Database returns amenities: [] by default on listings
   const loftVilla = {
     _id: 'v-loft',
     title: 'Modern Loft in Downtown',

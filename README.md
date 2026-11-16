@@ -228,3 +228,4 @@ Because the backend is a stateful Express server (sessions, database connections
 - **Start:** `node app.js`
 - **Environment:** `ATLASDB_URL`, `SECRET`, `PORT` (as required), `CLOUDINARY_*`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `MAP_TOKEN` (optional)
 - **Production checklist:** use MongoDB Atlas, enable HTTPS, configure CORS for your Vercel domain, and set secure cookie/session behavior for cross-origin auth.
+git

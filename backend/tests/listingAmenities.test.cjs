@@ -45,7 +45,6 @@ test('Listing model instantiates with dynamic amenities array', () => {
     amenities: ['ac', 'wifi', 'pool', 'parking', 'steamBath'],
   });
 
-  // Verify each villa has distinct dynamic facilities
   assert.strictEqual(villa1.amenities.length, 3);
   assert.strictEqual(villa1.amenities.includes('pool'), false);
   assert.strictEqual(villa1.amenities.includes('steamBath'), true);

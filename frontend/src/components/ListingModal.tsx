@@ -99,7 +99,7 @@ export const ListingModal: React.FC<ListingModalProps> = ({
     <ModalPortal>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
         <div className="bg-white rounded-3xl shadow-xl w-full max-w-xl max-h-[calc(100dvh-2rem)] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
-        {/* Header */}
+        
         <div className="flex items-center justify-between px-6 pt-6 pb-2 border-b border-gray-100">
           <h2 className="text-xl font-bold text-gray-900">
             {isEdit ? 'Edit Listing' : 'Host on Stay-Go'}
@@ -112,7 +112,7 @@ export const ListingModal: React.FC<ListingModalProps> = ({
           </button>
         </div>
 
-        {/* Form */}
+        
         <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto min-h-0">
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Title</label>
@@ -236,7 +236,7 @@ export const ListingModal: React.FC<ListingModalProps> = ({
             </div>
           </div>
 
-          {/* Dynamic Villa Facilities / Amenities Selector */}
+          
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">
               Villa Facilities / Amenities (Select which apply to this stay)

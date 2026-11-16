@@ -87,7 +87,6 @@ const ALIAS_MAP: Record<string, string> = {
   'fitness': 'gym',
 };
 
-// Category defaults when a villa does NOT have explicit amenities configured yet
 const CATEGORY_DEFAULT_AMENITIES: Record<string, string[]> = {
   pools: ['pool', 'wifi', 'parking', 'ac'],
   beach: ['ac', 'wifi', 'pool', 'parking'],
@@ -114,7 +113,6 @@ export function normalizeAmenityKey(input: string): string | null {
 export function getAmenitiesForVilla(listing?: Listing | null): AmenityDefinition[] {
   if (!listing) return [];
 
-  // 1. Explicit amenities defined on the villa
   if (Array.isArray(listing.amenities) && listing.amenities.length > 0) {
     const result: AmenityDefinition[] = [];
     for (const raw of listing.amenities) {
@@ -124,7 +122,6 @@ export function getAmenitiesForVilla(listing?: Listing | null): AmenityDefinitio
           result.push(KNOWN_AMENITIES[key]);
         }
       } else if (raw && raw.trim()) {
-        // Fallback for custom user-added amenity
         result.push({
           key: raw.trim().toLowerCase(),
           title: raw.trim(),
@@ -136,7 +133,6 @@ export function getAmenitiesForVilla(listing?: Listing | null): AmenityDefinitio
     return result;
   }
 
-  // 2. Specific villa check for Modern Loft / Downtown
   const desc = (listing.description || '').toLowerCase();
   const title = (listing.title || '').toLowerCase();
   if (
@@ -152,14 +148,12 @@ export function getAmenitiesForVilla(listing?: Listing | null): AmenityDefinitio
     ];
   }
 
-  // 3. Category-tailored dynamic default (not all identical across every villa!)
   const category = (listing.category || '').trim();
   const categoryKeys = CATEGORY_DEFAULT_AMENITIES[category];
   if (categoryKeys && categoryKeys.length > 0) {
     return categoryKeys.map((k) => KNOWN_AMENITIES[k]).filter(Boolean);
   }
 
-  // 4. Default based on title characteristics
   const keys: string[] = ['wifi'];
   if (title.includes('pool') || desc.includes('pool')) keys.push('pool');
   if (title.includes('villa') || title.includes('luxury') || desc.includes('luxury')) {

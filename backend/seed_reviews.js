@@ -29,7 +29,6 @@ async function seedReviews() {
 
   for (let i = 0; i < listings.length; i++) {
     const listing = listings[i];
-    // Seed 1-2 reviews for every 2nd or 3rd listing so some have reviews (4.7-5.0) and some are "New"
     if (listing.reviews.length === 0 && (i % 2 === 0 || i < 6)) {
       const reviewCount = (i % 3 === 0) ? 2 : 1;
       for (let r = 0; r < reviewCount; r++) {

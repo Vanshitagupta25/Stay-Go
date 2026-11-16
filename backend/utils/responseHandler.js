@@ -1,8 +1,3 @@
-/**
- * Helper utility to determine if the request is an API request expecting JSON
- * @param {Object} req - Express request object
- * @returns {boolean}
- */
 const isApiRequest = (req) => {
   return Boolean(
     req.xhr ||
@@ -11,19 +6,6 @@ const isApiRequest = (req) => {
   );
 };
 
-/**
- * Unified response handler for dual support (JSON API & EJS Redirects/Views)
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Object} options - Response configuration
- * @param {number} [options.statusCode=200] - HTTP Status Code
- * @param {boolean} [options.success] - Success flag (defaults to true if statusCode < 400)
- * @param {string} [options.message=""] - Message string for API response or flash alert
- * @param {Object} [options.data=null] - Object containing payload data for JSON response
- * @param {string} [options.redirectUrl=null] - Redirect path for traditional EJS web views
- * @param {string} [options.renderView=null] - View name for rendering EJS directly
- * @param {string} [options.flashType] - Flash alert category ('info' | 'error')
- */
 const sendResponse = (req, res, options = {}) => {
   const {
     statusCode = 200,

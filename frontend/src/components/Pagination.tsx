@@ -24,14 +24,12 @@ export const Pagination: React.FC<PaginationProps> = ({
   siblingCount = 1,
   className = '',
 }) => {
-  // Generate pagination items (numbers + ellipses)
   const paginationRange = useMemo(() => {
     if (totalPages <= 0) return [];
     if (totalPages === 1) return [1];
 
     const totalPageNumbers = siblingCount * 2 + 5; // siblingCount + first + last + current + 2*dots
 
-    // Case 1: Total pages is less than the page numbers we want to show
     if (totalPages <= totalPageNumbers) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
@@ -45,14 +43,12 @@ export const Pagination: React.FC<PaginationProps> = ({
     const firstPageIndex = 1;
     const lastPageIndex = totalPages;
 
-    // Case 2: No left dots, but right dots needed
     if (!shouldShowLeftDots && shouldShowRightDots) {
       const leftItemCount = 3 + 2 * siblingCount;
       const leftRange = Array.from({ length: leftItemCount }, (_, i) => i + 1);
       return [...leftRange, 'DOTS', totalPages];
     }
 
-    // Case 3: No right dots, but left dots needed
     if (shouldShowLeftDots && !shouldShowRightDots) {
       const rightItemCount = 3 + 2 * siblingCount;
       const rightRange = Array.from(
@@ -62,7 +58,6 @@ export const Pagination: React.FC<PaginationProps> = ({
       return [firstPageIndex, 'DOTS', ...rightRange];
     }
 
-    // Case 4: Both left and right dots needed
     if (shouldShowLeftDots && shouldShowRightDots) {
       const middleRange = Array.from(
         { length: rightSiblingIndex - leftSiblingIndex + 1 },
@@ -87,7 +82,7 @@ export const Pagination: React.FC<PaginationProps> = ({
       aria-label="Pagination Navigation"
       className={`mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-200/80 pt-6 sm:flex-row ${className}`}
     >
-      {/* Items count summary */}
+      
       {showInfo && totalItems !== undefined && (
         <p className="text-sm text-gray-500">
           {startIndex !== undefined && endIndex !== undefined ? (
@@ -104,9 +99,9 @@ export const Pagination: React.FC<PaginationProps> = ({
         </p>
       )}
 
-      {/* Pagination Controls */}
+      
       <div className="inline-flex items-center gap-1.5 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-sm">
-        {/* Previous Page Button */}
+        
         <button
           type="button"
           onClick={() => onPageChange(currentPage - 1)}
@@ -118,7 +113,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           <span className="hidden sm:inline">Prev</span>
         </button>
 
-        {/* Page numbers and ellipsis */}
+        
         {paginationRange.map((pageNumber, idx) => {
           if (pageNumber === 'DOTS') {
             return (
@@ -152,7 +147,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           );
         })}
 
-        {/* Next Page Button */}
+        
         <button
           type="button"
           onClick={() => onPageChange(currentPage + 1)}

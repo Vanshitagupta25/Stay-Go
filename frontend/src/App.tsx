@@ -50,7 +50,6 @@ export function App() {
   const [isWishlistModalOpen, setIsWishlistModalOpen] = useState(false);
   const [isBookingsModalOpen, setIsBookingsModalOpen] = useState(false);
 
-  // Sync favorites state with user's saved wishlist in DB
   useEffect(() => {
     if (user?.wishlist && Array.isArray(user.wishlist)) {
       const favMap: Record<string, boolean> = {};
@@ -64,11 +63,9 @@ export function App() {
     }
   }, [user]);
 
-  // Real Wishlist toggle persisted in Database
   const toggleFavorite = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) {
-      // Prompt user to log in so their wishlist persists
       setAuthModalState({ isOpen: true, mode: 'login' });
       return;
     }
@@ -76,10 +73,8 @@ export function App() {
     const isCurrentlyFav = Boolean(favorites[id]);
     const nextState = !isCurrentlyFav;
 
-    // Optimistic UI update
     setFavorites((prev) => ({ ...prev, [id]: nextState }));
 
-    // Micro toast feedback
     setWishlistToast({
       message: nextState ? 'Saved to wishlist' : 'Removed from wishlist',
       visible: true,
@@ -95,7 +90,6 @@ export function App() {
         }));
       }
     } catch (err) {
-      // Revert if API failed
       setFavorites((prev) => ({ ...prev, [id]: isCurrentlyFav }));
       console.error('Failed to update favorite in DB:', err);
     }
@@ -115,7 +109,6 @@ export function App() {
 
   const selectedSortOption = SORT_OPTIONS.find((opt) => opt.value === selectedSort) || SORT_OPTIONS[0];
 
-  // Check active user session on app mount using authService
   useEffect(() => {
     authService
       .getCurrentUser()
@@ -135,7 +128,6 @@ export function App() {
     setFavorites({});
   };
 
-  // Fetch listings dynamically from backend API using RTK Query
   const { data, isLoading, isError, refetch } = useGetListingsQuery({
     category: selectedCategory || undefined,
     city: searchCity.trim() || undefined,
@@ -147,7 +139,6 @@ export function App() {
     guests: guests > 0 ? guests : undefined,
   });
 
-  // Memoized listings to guarantee search filter & sort work in tandem seamlessly
   const listings = useMemo(() => {
     let list = data?.listings ? [...data.listings] : [];
     if (searchCity && searchCity.trim()) {
@@ -282,7 +273,7 @@ export function App() {
                   </button>
                 )}
 
-                {/* Custom Matching Dimension Sorting Dropdown */}
+                
                 <div className="relative z-20 min-w-0 flex-1 sm:flex-none" ref={sortRef}>
                   <button
                     type="button"
@@ -354,7 +345,7 @@ export function App() {
           />
         </Reveal>
 
-        {/* Active Filter Chips */}
+        
         <AnimatePresence initial={false}>
           {activeFilterCount > 0 && (
             <motion.div
@@ -434,7 +425,7 @@ export function App() {
           )}
         </AnimatePresence>
 
-        {/* Loading & Error States */}
+        
         {isLoading && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
             {Array.from({ length: 10 }).map((_, index) => (
@@ -478,12 +469,11 @@ export function App() {
           </div>
         )}
 
-        {/* Listings Content */}
+        
         {!isLoading && !isError && listings.length > 0 && (
           searchCity.trim() ? (
-            /* Split View: Listings on Left, Compact Viewport-Fit Google Maps on Right */
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-stretch w-full">
-              {/* Left Column: Listing Cards & Pagination */}
+              
               <div className="w-full lg:w-[54%] xl:w-[56%] shrink-0 flex flex-col justify-between">
                 <div>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
@@ -503,7 +493,7 @@ export function App() {
                   </div>
                 </div>
 
-                {/* Pagination */}
+                
                 <div className="pt-6">
                   <Pagination
                     currentPage={currentPage}
@@ -517,7 +507,7 @@ export function App() {
                 </div>
               </div>
 
-              {/* Right Column: Google Maps displaying entire map at once with end border */}
+              
               <div className="w-full lg:w-[46%] xl:w-[44%] h-[340px] sm:h-[380px] lg:h-auto lg:self-stretch lg:min-h-[290px] lg:max-h-[calc(100vh-320px)] lg:sticky lg:top-24 rounded-2xl overflow-hidden border border-gray-200 shadow-sm flex flex-col">
                 <CitySplitMap
                   listings={listings}
@@ -528,7 +518,6 @@ export function App() {
               </div>
             </div>
           ) : (
-            /* Compact Cards Grid utilizing full side space with extracted details below image */
             <>
               <div className="grid grid-cols-1 gap-x-4 gap-y-7 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 {listings.map((listing, index) => (
@@ -543,7 +532,7 @@ export function App() {
                 ))}
               </div>
 
-              {/* Pagination */}
+              
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -557,7 +546,7 @@ export function App() {
         )}
       </main>
 
-      {/* Floating Wishlist Micro-Toast Notification */}
+      
       <AnimatePresence>
         {wishlistToast && (
           <motion.div
@@ -573,7 +562,7 @@ export function App() {
         )}
       </AnimatePresence>
 
-      {/* Detail / Booking Full Page View */}
+      
       {selectedListing && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-white">
           <ListingShow
@@ -598,7 +587,7 @@ export function App() {
         </div>
       </footer>
 
-      {/* Create Listing Modal */}
+      
       <ListingModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
@@ -614,7 +603,7 @@ export function App() {
         }}
       />
 
-      {/* Authentication Modal */}
+      
       <AuthModal
         key={`${authModalState.mode}-${authModalState.isOpen}`}
         isOpen={authModalState.isOpen}
@@ -623,7 +612,7 @@ export function App() {
         onSuccess={(loggedUser) => setUser(loggedUser)}
       />
 
-      {/* Wishlist Modal */}
+      
       <WishlistModal
         isOpen={isWishlistModalOpen}
         onClose={() => setIsWishlistModalOpen(false)}
@@ -633,7 +622,7 @@ export function App() {
         }}
       />
 
-      {/* Bookings Modal */}
+      
       <BookingsModal
         isOpen={isBookingsModalOpen}
         onClose={() => setIsBookingsModalOpen(false)}

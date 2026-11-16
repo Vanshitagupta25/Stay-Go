@@ -6,13 +6,7 @@ export interface CreateReviewInput {
   comment: string;
 }
 
-/**
- * Reviews service encapsulating creating and deleting reviews.
- */
 export const reviewService = {
-  /**
-   * Submit a review for a specific listing
-   */
   async addReview(
     listingId: string,
     input: CreateReviewInput
@@ -26,9 +20,6 @@ export const reviewService = {
     return response.data;
   },
 
-  /**
-   * Delete a review for a specific listing
-   */
   async deleteReview(
     listingId: string,
     reviewId: string

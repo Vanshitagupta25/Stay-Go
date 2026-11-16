@@ -41,13 +41,7 @@ export interface CreateListingInput {
   amenities?: string[];
 }
 
-/**
- * Listings service encapsulating browsing, fetching, creating, and deleting listings.
- */
 export const listingService = {
-  /**
-   * Fetch paginated listings with optional filters (category, city, sort, page, limit)
-   */
   async getListings(params?: ListingFilterParams): Promise<GetListingsApiResponse> {
     const response = await apiClient.get<GetListingsApiResponse>(API_ENDPOINTS.LISTINGS.BASE, {
       params,
@@ -55,9 +49,6 @@ export const listingService = {
     return response.data;
   },
 
-  /**
-   * Fetch a single listing by its ID
-   */
   async getListingById(id: string): Promise<{ success: boolean; listing: any }> {
     const response = await apiClient.get<{ success: boolean; listing: any }>(
       API_ENDPOINTS.LISTINGS.BY_ID(id)
@@ -65,9 +56,6 @@ export const listingService = {
     return response.data;
   },
 
-  /**
-   * Create a new listing with multipart/form-data support
-   */
   async createListing(
     input: CreateListingInput,
     imageFile?: File | null
@@ -82,9 +70,6 @@ export const listingService = {
     return response.data;
   },
 
-  /**
-   * Delete a listing by ID
-   */
   async deleteListing(id: string): Promise<{ success: boolean; message?: string }> {
     const response = await apiClient.delete<{ success: boolean; message?: string }>(
       API_ENDPOINTS.LISTINGS.BY_ID(id)

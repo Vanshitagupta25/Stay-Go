@@ -77,7 +77,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   });
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-  // Guest counters (adults, children, infants)
   const [adults, setAdults] = useState(guests > 0 ? guests : 0);
   const [children, setChildren] = useState(0);
   const [infants, setInfants] = useState(0);
@@ -87,12 +86,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const destinationInputRef = useRef<HTMLInputElement>(null);
 
-  // Sync internalQuery when external search query is changed externally
   useEffect(() => {
     setInternalQuery(externalSearchQuery || '');
   }, [externalSearchQuery]);
 
-  // Sync guests from external prop if changed
   useEffect(() => {
     if (guests !== adults + children) {
       setAdults(guests > 0 ? guests : 0);
@@ -101,7 +98,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     }
   }, [guests]);
 
-  // Click outside handling for search popovers and profile dropdown
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as Node;
@@ -171,7 +167,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     setIsMobileExpanded(false);
   };
 
-  // Format short date (e.g. "Oct 24")
   const formatShortDate = (isoStr?: string) => {
     if (!isoStr) return '';
     const [y, m, d] = isoStr.split('-').map(Number);
@@ -182,7 +177,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     });
   };
 
-  // Format human-friendly last active status
   const formatLastActive = (lastActiveDate?: string | Date) => {
     if (!lastActiveDate) {
       return { text: 'Active now', isLive: true };
@@ -222,7 +216,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       <header className="sticky top-0 z-40 border-b border-black/5 bg-white/90 shadow-[0_1px_2px_rgba(28,25,23,0.04)] backdrop-blur-md">
         <div className="mx-auto flex h-20 max-w-[1920px] items-center justify-between gap-2 px-3 sm:gap-3 sm:px-6 lg:gap-4 lg:px-12 xl:px-14 2xl:px-16">
 
-          {/* Logo & Explore */}
+          
           <div className="flex shrink-0 items-center gap-3">
             <a href="/" className="flex items-center gap-2 text-xl font-bold text-[#fe424d] transition hover:opacity-90">
               <Compass className="h-8 w-8" />
@@ -230,17 +224,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             </a>
           </div>
 
-          {/* Interactive Multi-Toggle Search Bar (Where | When | Who) */}
+          
           <div className="relative mx-0 min-w-0 max-w-2xl flex-1 sm:mx-2 lg:mx-3" ref={searchContainerRef}>
 
-            {/* Desktop / Tablet: 3-Segment Interactive Pill Bar */}
+            
             <div
               className={`hidden md:flex w-full min-w-0 items-center h-14 rounded-full border transition-all duration-200 ${activeToggle
                 ? 'bg-gray-100/90 border-gray-300 shadow-sm'
                 : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
                 }`}
             >
-              {/* Toggle 1: WHERE */}
+              
               <div
                 onClick={() => {
                   setActiveToggle('where');
@@ -287,12 +281,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               </div>
 
-              {/* Divider 1 */}
+              
               {activeToggle !== 'where' && activeToggle !== 'when' && (
                 <div className="w-px h-6 bg-gray-200 shrink-0" />
               )}
 
-              {/* Toggle 2: WHEN */}
+              
               <div
                 onClick={() => setActiveToggle(activeToggle === 'when' ? null : 'when')}
                 className={`flex h-full min-w-0 flex-1 basis-0 flex-col justify-center rounded-full px-4 cursor-pointer select-none transition-all duration-150 lg:px-5 ${activeToggle === 'when'
@@ -332,12 +326,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               </div>
 
-              {/* Divider 2 */}
+              
               {activeToggle !== 'when' && activeToggle !== 'who' && (
                 <div className="w-px h-6 bg-gray-200 shrink-0" />
               )}
 
-              {/* Toggle 3: WHO */}
+              
               <div
                 onClick={() => setActiveToggle(activeToggle === 'who' ? null : 'who')}
                 className={`flex h-full min-w-0 flex-1 basis-0 items-center justify-between gap-1 rounded-full pl-4 pr-1.5 cursor-pointer select-none transition-all duration-150 lg:pl-5 lg:pr-2 ${activeToggle === 'who'
@@ -375,7 +369,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </button>
                   )}
 
-                  {/* Search Action Button */}
+                  
                   <button
                     type="button"
                     onClick={(e) => {
@@ -391,7 +385,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             </div>
 
-            {/* Mobile: Compact Search Pill that Expands */}
+            
             <div className="md:hidden">
               <button
                 type="button"
@@ -415,7 +409,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               </button>
 
-              {/* Mobile Expanded Drawer */}
+              
               <AnimatePresence>
                 {isMobileExpanded && (
                   <motion.div
@@ -436,7 +430,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </button>
                   </div>
 
-                  {/* Mobile Where Input */}
+                  
                   <div className="mb-3">
                     <label className="block text-xs font-medium text-gray-700 mb-1">
                       Where
@@ -450,7 +444,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     />
                   </div>
 
-                  {/* Quick Select Buttons for When and Who */}
+                  
                   <div className="grid grid-cols-2 gap-2 mb-4">
                     <button
                       type="button"
@@ -487,7 +481,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </button>
                   </div>
 
-                  {/* Mobile Search Button */}
+                  
                   <button
                     type="button"
                     onClick={executeSearch}
@@ -501,7 +495,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </AnimatePresence>
             </div>
 
-            {/* POPOVER 1: WHERE - Popular Destinations */}
+            
             <AnimatePresence>
               {activeToggle === 'where' && (
                 <motion.div
@@ -556,7 +550,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </AnimatePresence>
 
-            {/* POPOVER 2: WHEN - Two-Month Calendar */}
+            
             <AnimatePresence>
               {activeToggle === 'when' && (
                 <motion.div
@@ -592,7 +586,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   compact={true}
                 />
 
-                {/* Popover Footer */}
+                
                 <div className="mt-3 flex flex-col gap-2 border-t border-gray-100 pt-2.5 sm:flex-row sm:items-center sm:justify-between">
                   <button
                     type="button"
@@ -626,7 +620,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </AnimatePresence>
 
-            {/* POPOVER 3: WHO - Interactive Guest Counters */}
+            
             <AnimatePresence>
               {activeToggle === 'who' && (
                 <motion.div
@@ -651,7 +645,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
 
                 <div className="space-y-4">
-                  {/* Row 1: Adults */}
+                  
                   <div className="flex items-center justify-between py-1">
                     <div>
                       <p className="text-sm font-bold text-gray-900">Adults</p>
@@ -682,7 +676,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                   <div className="border-t border-gray-100" />
 
-                  {/* Row 2: Children */}
+                  
                   <div className="flex items-center justify-between py-1">
                     <div>
                       <p className="text-sm font-bold text-gray-900">Children</p>
@@ -716,7 +710,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                   <div className="border-t border-gray-100" />
 
-                  {/* Row 3: Infants */}
+                  
                   <div className="flex items-center justify-between py-1">
                     <div>
                       <p className="text-sm font-bold text-gray-900">Infants</p>
@@ -749,7 +743,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
                 </div>
 
-                {/* Popover Footer */}
+                
                 <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between">
                   <button
                     type="button"
@@ -774,7 +768,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           </div>
 
-          {/* Right Navigation */}
+          
           <div className="flex items-center gap-2.5 shrink-0">
             <button
               onClick={onOpenCreateModal}
@@ -784,9 +778,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             {user ? (
-              /* When logged in: Interactive User Profile Avatar with dropdown + separate logout icon */
               <div className="flex items-center gap-2 shrink-0">
-                {/* Interactive Profile Icon & Dropdown Container */}
+                
                 <div className="relative flex items-center" ref={profileButtonRef}>
                   <button
                     type="button"
@@ -803,7 +796,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     {initial}
                   </button>
 
-                  {/* Profile Dropdown Menu */}
+                  
                   {typeof document !== 'undefined' &&
                     createPortal(
                       <AnimatePresence>
@@ -819,7 +812,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                             role="menu"
                             aria-orientation="vertical"
                           >
-                      {/* User Profile Card Header */}
+                      
                       <div className="px-4 py-2.5 border-b border-gray-100 bg-gray-50/60">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-full bg-[#fe424d] text-white font-bold text-sm flex items-center justify-center shadow-xs shrink-0 select-none">
@@ -832,7 +825,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                             <p className="text-[11px] sm:text-xs text-gray-500 truncate" title={email}>
                               {email || 'No email attached'}
                             </p>
-                            {/* User Last Active Indicator */}
+                            
                             <div className="flex items-center gap-1.5 mt-0.5">
                               <span
                                 className={`w-1.5 h-1.5 rounded-full ${
@@ -849,9 +842,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                         </div>
                       </div>
 
-                      {/* Dropdown Navigation Actions */}
+                      
                       <div className="py-1">
-                        {/* My Wishlists */}
+                        
                         <button
                           type="button"
                           onClick={() => {
@@ -874,7 +867,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           )}
                         </button>
 
-                        {/* My Booking */}
+                        
                         <button
                           type="button"
                           onClick={() => {
@@ -892,7 +885,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           </div>
                         </button>
 
-                        {/* Host on Stay-Go (shown on mobile / tablet) */}
+                        
                         <button
                           type="button"
                           onClick={() => {
@@ -909,10 +902,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                         </button>
                       </div>
 
-                      {/* Divider */}
+                      
                       <div className="border-t border-gray-100 my-1" />
 
-                      {/* Logout Action */}
+                      
                       <div className="py-1">
                         <button
                           type="button"
@@ -936,7 +929,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     )}
                 </div>
 
-                {/* Separate Rounded-Full Logout Icon Button (opens confirmation modal) */}
+                
                 <button
                   type="button"
                   onClick={() => setIsLogoutModalOpen(true)}
@@ -948,7 +941,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               </div>
             ) : (
-              /* When logged out: Rounded-Full Login Icon Button */
               <button
                 type="button"
                 onClick={() => onOpenAuthModal('login')}
@@ -964,7 +956,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </header>
 
-      {/* Reusable Logout Confirmation Modal */}
+      
       <LogoutModal
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
@@ -972,7 +964,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         user={user}
       />
 
-      {/* Floating Action Button (FAB) - Hidden cleanly when modal is open */}
+      
       {!isModalOpen && !isLogoutModalOpen && typeof document !== 'undefined' &&
         createPortal(
           <div

@@ -33,7 +33,6 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({
       .then((res) => {
         if (!isMounted) return;
         if (res?.success && Array.isArray(res.wishlist)) {
-          // Filter out null or undefined listings if any
           const validListings = res.wishlist.filter(
             (item: any) => item && typeof item === 'object' && item._id
           );
@@ -55,7 +54,6 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({
     };
   }, [isOpen]);
 
-  // Handle ESC key
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -70,7 +68,6 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({
   const handleRemove = async (e: React.MouseEvent, listingId: string) => {
     e.stopPropagation();
     try {
-      // Optimistic update
       setWishlistItems((prev) => prev.filter((item) => item._id !== listingId));
       if (onRemoveFavorite) {
         onRemoveFavorite(listingId);
@@ -95,7 +92,7 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({
       >
       <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 fade-in duration-200">
         
-        {/* Modal Header */}
+        
         <div className="px-6 py-4.5 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-[#fe424d]">
@@ -120,7 +117,7 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({
           </button>
         </div>
 
-        {/* Modal Body */}
+        
         <div className="p-6 overflow-y-auto flex-1">
           {loading && (
             <div className="flex flex-col items-center justify-center py-20 text-gray-400">
@@ -221,7 +218,7 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({
           )}
         </div>
 
-        {/* Footer */}
+        
         <div className="px-6 py-3 border-t border-gray-100 flex items-center justify-end bg-gray-50/60">
           <button
             type="button"

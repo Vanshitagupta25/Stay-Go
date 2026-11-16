@@ -36,6 +36,7 @@ export const BookingWidget: React.FC<BookingProps> = ({
   onBookingConfirmed,
 }) => {
   const [guests, setGuests] = useState<number>(1);
+  const [notice, setNotice] = useState<{ type: "error" | "success" | "info"; message: string } | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const guestLimit =
     typeof maxGuests === 'number' && Number.isFinite(maxGuests) && maxGuests > 0
@@ -43,9 +44,8 @@ export const BookingWidget: React.FC<BookingProps> = ({
       : 1;
   const selectedGuests = Math.min(guests, guestLimit);
 
-  // RTK Query hooks for state, loading, and error handling
-  const [createOrder, { isLoading: isCreatingOrder, error: createOrderError }] = useCreateOrderMutation();
-  const [verifySignature, { isLoading: isVerifying, error: verifyError }] = useVerifySignatureMutation();
+  const [createOrder, { isLoading: isCreatingOrder, error: createOrderError, reset: resetCreateOrder }] = useCreateOrderMutation();
+  const [verifySignature, { isLoading: isVerifying, error: verifyError, reset: resetVerify }] = useVerifySignatureMutation();
   const [cancelOrder] = useCancelOrderMutation();
 
   const isLoading = isCreatingOrder || isVerifying;
@@ -57,7 +57,6 @@ export const BookingWidget: React.FC<BookingProps> = ({
     isProcessing: isLoading,
   });
 
-  // Calculate nights
   const calculateNights = (): number => {
     if (!checkIn || !checkOut) return 0;
     const [y1, m1, d1] = checkIn.split("-").map(Number);
@@ -88,27 +87,33 @@ export const BookingWidget: React.FC<BookingProps> = ({
   };
 
   const handlePayment = async () => {
+    setNotice(null);
+    resetCreateOrder();
+    resetVerify();
+
     if (!checkIn || !checkOut) {
-      alert("Please select check-in and check-out dates on the calendar.");
+      setNotice({ type: "error", message: "Please select check-in and check-out dates." });
+      return;
+    }
+
+    if (checkOut <= checkIn) {
+      setNotice({ type: "error", message: "Check-out date must be after check-in date." });
       return;
     }
 
     if (isUnavailable) {
-      alert("These dates are already booked. Please choose different dates.");
       return;
     }
 
     try {
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
-        alert("Razorpay SDK failed to load. Are you online?");
+        setNotice({ type: "error", message: "Razorpay SDK failed to load. Please check your connection and try again." });
         return;
       }
 
-      // 1. Create order via RTK Query mutation
       const orderData = await createOrder({ listingId, checkIn, checkOut }).unwrap();
 
-      // 2. Razorpay Options
       const options = {
         key: orderData.razorpayKeyId || import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: orderData.amount,
@@ -118,7 +123,6 @@ export const BookingWidget: React.FC<BookingProps> = ({
         order_id: orderData.orderId,
         handler: async function (response: any) {
           try {
-            // 3. Verify payment signature via RTK Query mutation
             const verifyRes = await verifySignature({
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
@@ -128,12 +132,14 @@ export const BookingWidget: React.FC<BookingProps> = ({
             if (verifyRes.success) {
               onBookingConfirmed?.();
               onAvailabilityRefresh?.();
-              alert("Booking confirmed! Payment successful.");
+              setNotice({ type: "success", message: "Booking confirmed! Payment successful." });
+            } else {
+              setNotice({ type: "error", message: "Payment verification failed. Please contact support if amount was deducted." });
             }
           } catch (err: any) {
             console.error("Verification failed:", err);
             onAvailabilityRefresh?.();
-            alert(err?.data?.message || "Payment verification failed!");
+            setNotice({ type: "error", message: err?.data?.message || "Payment verification failed." });
           }
         },
         prefill: {
@@ -147,7 +153,7 @@ export const BookingWidget: React.FC<BookingProps> = ({
         modal: {
           ondismiss: function () {
             releasePendingHold(orderData.bookingId);
-            alert("Payment was cancelled or closed before completion.");
+            setNotice({ type: "info", message: "Payment was cancelled before completion." });
           },
         },
       };
@@ -157,7 +163,7 @@ export const BookingWidget: React.FC<BookingProps> = ({
       paymentObject.on("payment.failed", function (response: any) {
         console.error("Payment failed:", response.error);
         releasePendingHold(orderData.bookingId);
-        alert("Payment failed: " + response.error.description);
+        setNotice({ type: "error", message: "Payment failed: " + (response?.error?.description || "Please try again.") });
       });
 
       paymentObject.open();
@@ -166,13 +172,16 @@ export const BookingWidget: React.FC<BookingProps> = ({
       if (err?.status === 409) {
         onAvailabilityRefresh?.();
       }
-      alert(err?.data?.message || "Error initiating payment.");
+      setNotice({ type: "error", message: err?.data?.message || "Error initiating payment. Please try again." });
     }
   };
 
   const errorMessage =
-    (createOrderError as any)?.data?.message ||
-    (verifyError as any)?.data?.message;
+    notice?.type === "error"
+      ? notice.message
+      : (createOrderError as any)?.data?.message || (verifyError as any)?.data?.message;
+  const successMessage = notice?.type === "success" ? notice.message : null;
+  const infoMessage = notice?.type === "info" ? notice.message : null;
 
   const todayStr = React.useMemo(() => new Date().toISOString().split("T")[0], []);
 
@@ -181,6 +190,7 @@ export const BookingWidget: React.FC<BookingProps> = ({
       <AnimatePresence>
         {errorMessage && (
           <motion.div
+            key="error"
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
@@ -189,9 +199,31 @@ export const BookingWidget: React.FC<BookingProps> = ({
             {errorMessage}
           </motion.div>
         )}
+        {successMessage && (
+          <motion.div
+            key="success"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-700"
+          >
+            {successMessage}
+          </motion.div>
+        )}
+        {infoMessage && (
+          <motion.div
+            key="info"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="rounded-2xl border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700"
+          >
+            {infoMessage}
+          </motion.div>
+        )}
       </AnimatePresence>
 
-      {/* Airbnb style Check-in / Checkout / Guests box */}
+      
       <div className="overflow-hidden rounded-2xl border border-gray-300 bg-white transition focus-within:border-gray-900 focus-within:ring-2 focus-within:ring-gray-900/10">
         <div className="grid grid-cols-2 border-b border-gray-300">
           <div className="border-r border-gray-300 p-2.5">
@@ -254,7 +286,7 @@ export const BookingWidget: React.FC<BookingProps> = ({
         {buttonState.label}
       </motion.button>
 
-      {/* Pricing breakdown if dates are selected */}
+      
       <AnimatePresence initial={false}>
         {nights > 0 && (
           <motion.div

@@ -125,7 +125,6 @@ app.use((req, res, next) => {
   });
 });
 
-//Error-handling Middleware
 app.use((err, req, res, next) => {
   const fs = require('fs');
   fs.appendFileSync('error.log', new Date().toISOString() + ' ' + (err.stack || err) + '\n');
@@ -138,8 +137,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-
-// Background job to clean up PENDING bookings older than 24 hours
 setInterval(async () => {
   try {
     const Booking = require('./models/booking.js');
@@ -154,7 +151,7 @@ setInterval(async () => {
   } catch (err) {
     console.error("Error in background cleanup job:", err);
   }
-}, 60 * 60 * 1000); // Runs every 1 hour
+}, 60 * 60 * 1000);
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port, ${PORT}`);

@@ -12,7 +12,6 @@ interface CitySplitMapProps {
   onSelectListing: (listing: Listing) => void;
 }
 
-// Known city coordinates in India / Global for instant centering fallback
 const CITY_COORDINATES: Record<string, [number, number]> = {
   goa: [15.2993, 74.124],
   mumbai: [19.076, 72.8777],
@@ -33,7 +32,6 @@ const CITY_COORDINATES: Record<string, [number, number]> = {
   ooty: [11.4102, 76.695],
 };
 
-// Component to dynamically fit map bounds or center on listings change
 function MapAutoBounds({
   bounds,
   fallbackCenter,
@@ -44,7 +42,6 @@ function MapAutoBounds({
   const map = useMap();
 
   useEffect(() => {
-    // Invalidate size immediately so Leaflet adapts to container size
     map.invalidateSize();
 
     if (bounds && bounds.length > 1) {
@@ -82,7 +79,6 @@ function MapAutoBounds({
   return null;
 }
 
-// Custom Zoom In/Out control with flex layout, border radius, and minimal gap
 function CustomZoomControl() {
   const map = useMap();
   return (
@@ -115,7 +111,6 @@ function CustomZoomControl() {
   );
 }
 
-// Function to generate an authentic Stay-Go map pin marker
 function createPinMarkerIcon(isHovered: boolean) {
   return L.divIcon({
     className: 'stay-map-pin',
@@ -149,7 +144,6 @@ export const CitySplitMap: React.FC<CitySplitMapProps> = ({
   hoveredListingId,
   onSelectListing,
 }) => {
-  // Determine city fallback coordinates
   const cityKey = searchCity.trim().toLowerCase();
   const defaultCenter: [number, number] = useMemo(() => {
     for (const [key, coords] of Object.entries(CITY_COORDINATES)) {
@@ -160,7 +154,6 @@ export const CitySplitMap: React.FC<CitySplitMapProps> = ({
     return [20.5937, 78.9629]; // Default to India center
   }, [cityKey]);
 
-  // Extract coordinates for all listings (handling GeoJSON [lng, lat] -> Leaflet [lat, lng])
   const listingsWithCoords = useMemo(() => {
     return listings.map((listing, index) => {
       let lat: number | null = null;
@@ -171,12 +164,10 @@ export const CitySplitMap: React.FC<CitySplitMapProps> = ({
         Array.isArray(listing.geometry.coordinates) &&
         listing.geometry.coordinates.length === 2
       ) {
-        // Mapbox / MongoDB stores [lng, lat]
         lng = Number(listing.geometry.coordinates[0]);
         lat = Number(listing.geometry.coordinates[1]);
       }
 
-      // If invalid or missing, generate a small deterministic offset near the default center
       if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
         lat = defaultCenter[0] + ((index % 5) - 2) * 0.015;
         lng = defaultCenter[1] + ((Math.floor(index / 5) % 5) - 2) * 0.015;
@@ -190,7 +181,6 @@ export const CitySplitMap: React.FC<CitySplitMapProps> = ({
     });
   }, [listings, defaultCenter]);
 
-  // Compute map bounds from markers
   const bounds: [number, number][] | null = useMemo(() => {
     if (listingsWithCoords.length === 0) return null;
     return listingsWithCoords.map((item) => [item.lat, item.lng]);
@@ -206,13 +196,13 @@ export const CitySplitMap: React.FC<CitySplitMapProps> = ({
         className="w-full h-full flex-1 z-0"
         style={{ width: '100%', height: '100%' }}
       >
-        {/* Same Google Maps TileLayer as used in the property detail page (ListingShow) */}
+        
         <TileLayer
           attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
           url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
         />
 
-        {/* Custom modern zoom in and out buttons with flex layout, border radius, and minimal gap */}
+        
         <CustomZoomControl />
 
         <MapAutoBounds bounds={bounds} fallbackCenter={defaultCenter} />

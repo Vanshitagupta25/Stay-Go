@@ -1,10 +1,5 @@
-/**
- * Unified Pricing Calculation Utility for Stay-Go bookings.
- * Calculates nightly accommodation, service fee, and applicable taxes.
- */
-
-const SERVICE_FEE_RATE = 0.12; // 12% Stay-Go platform service fee
-const TAX_RATE = 0.18; // 18% Applicable GST / taxes
+const SERVICE_FEE_RATE = 0.12;
+const TAX_RATE = 0.18;
 
 function calculateBookingPrice({ pricePerNight, numberOfNights }) {
   const safeNights = Number(numberOfNights) > 0 ? Math.round(Number(numberOfNights)) : 1;

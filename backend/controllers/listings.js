@@ -41,7 +41,6 @@ module.exports.index = async (req, res) => {
     filter.category = category.trim();
   }
 
-  // Filter out listings that have overlapping active bookings for the requested dates
   if (checkIn && checkOut) {
     const startDate = parseDateOnly(checkIn);
     const endDate = parseDateOnly(checkOut);
@@ -62,7 +61,6 @@ module.exports.index = async (req, res) => {
     }
   }
 
-  // Filter listings by guest capacity
   if (guests) {
     const guestCount = parseInt(guests, 10);
     if (!isNaN(guestCount) && guestCount > 0) {
@@ -77,7 +75,6 @@ module.exports.index = async (req, res) => {
     }
   }
 
-  // Construct sorting option for MongoDB
   let sortOption = {};
   if (sort === "price_asc" || sort === "price_low") {
     sortOption = { price: 1 };
@@ -91,7 +88,6 @@ module.exports.index = async (req, res) => {
 
   allListings = await Listing.find(filter).populate("reviews").sort(sortOption);
 
-  // In-memory fallback sort to guarantee numeric sort on price
   if (sort === "price_asc" || sort === "price_low") {
     allListings.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
   } else if (sort === "price_desc" || sort === "price_high") {
@@ -102,14 +98,12 @@ module.exports.index = async (req, res) => {
     allListings.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
   }
 
-  // Pagination calculation
   const totalListings = allListings.length;
   const totalPages = Math.max(1, Math.ceil(totalListings / limit));
   const currentPage = Math.min(page, totalPages);
   const startIndex = (currentPage - 1) * limit;
   const paginatedListings = allListings.slice(startIndex, startIndex + limit);
 
-  // Calculate real average rating and review count for each listing
   const enrichedListings = paginatedListings.map((item) => {
     const doc = item.toObject ? item.toObject() : { ...item };
     const revs = doc.reviews || [];

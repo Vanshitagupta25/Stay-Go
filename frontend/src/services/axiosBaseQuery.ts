@@ -11,10 +11,6 @@ export interface AxiosBaseQueryArgs {
   headers?: AxiosRequestConfig['headers'];
 }
 
-/**
- * Custom BaseQuery function for RTK Query that routes all requests
- * through the centralized common Axios instance.
- */
 export const axiosBaseQuery =
   (): BaseQueryFn<AxiosBaseQueryArgs, unknown, { status?: number; data?: any; message: string }> =>
   async ({ url, method = 'GET', data, body, params, headers }) => {

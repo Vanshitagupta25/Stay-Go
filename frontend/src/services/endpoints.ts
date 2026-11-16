@@ -1,7 +1,3 @@
-/**
- * Centralized API Endpoints organized by feature.
- * All paths are relative to the configured API base URL (which points to /api).
- */
 export const API_ENDPOINTS = {
   AUTH: {
     CURRENT_USER: '/curr-user',
