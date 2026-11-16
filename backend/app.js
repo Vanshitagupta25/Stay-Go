@@ -1,3 +1,7 @@
+const util = require("util");
+if (util.isArray !== Array.isArray) {
+  util.isArray = Array.isArray;
+}
 const dotenv = require("dotenv").config();
 const express = require("express");
 const app = express();
